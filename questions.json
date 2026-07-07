@@ -1,0 +1,46 @@
+{
+  "orientation": "landscape",
+  "kioskResolution": "1920x1080",
+  "wordFindSeconds": 15,
+  "idleResetSeconds": 10,
+  "quizPoints": 10,
+  "wordPoints": 10,
+  "puzzleVariants": 10,
+  "decoyWords": [
+    "WALLET", "NEFT", "IMPS", "SCAN", "BANK", "CASH", "OTP",
+    "PAY", "CARD", "LOAN", "BILL", "SEND", "SHOP", "VPA", "BHIM"
+  ],
+  "grid": {
+    "minSize": 10,
+    "maxSize": 24
+  },
+  "questions": [
+    {
+      "clue": "What does UPI stand for?",
+      "options": [
+        "Unified Payments Interface",
+        "Universal Payment Index",
+        "United Pay Integration"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "clue": "What is the most common way to pay by scanning at a shop?",
+      "options": [
+        "QR Code",
+        "Barcode",
+        "NFC Tag"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "clue": "What 4-digit secret code secures your PhonePe transactions?",
+      "options": [
+        "UPI PIN",
+        "OTP",
+        "CVV"
+      ],
+      "correctIndex": 0
+    }
+  ]
+}
