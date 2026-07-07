@@ -1,27 +1,7 @@
 const $app = document.getElementById("app");
 
-// ---- Kiosk hardening ----
-function hardenKiosk() {
-  window.addEventListener("contextmenu", (e) => e.preventDefault(), { passive: false });
-  window.addEventListener("selectstart", (e) => e.preventDefault(), { passive: false });
-  window.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
-
-  try {
-    history.pushState(null, "", location.href);
-    window.addEventListener("popstate", () => history.pushState(null, "", location.href));
-  } catch {}
-
-  let lastTouchEnd = 0;
-  document.addEventListener(
-    "touchend",
-    (e) => {
-      const now = Date.now();
-      if (now - lastTouchEnd <= 280) e.preventDefault();
-      lastTouchEnd = now;
-    },
-    { passive: false },
-  );
-
+// ---- App init (offline cache only — normal webpage behavior) ----
+function initApp() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
       .register("./sw.js", { updateViaCache: "none" })
@@ -533,7 +513,7 @@ function timerColor(ms, totalMs) {
 
 function renderHeader(title, subtitle, chips = "") {
   return `
-    <header class="header">
+    <header class="header site-header">
       <div class="brand">
         <div class="logo" aria-hidden="true"><div class="logo-mark"></div></div>
         <div class="title">
@@ -543,6 +523,15 @@ function renderHeader(title, subtitle, chips = "") {
       </div>
       <div class="header-meta">${chips}</div>
     </header>
+  `;
+}
+
+function renderSiteFooter(left = "PhonePe Quiz Game", right = "© PhonePe") {
+  return `
+    <footer class="footer site-footer">
+      <span>${left}</span>
+      <span>${right}</span>
+    </footer>
   `;
 }
 
@@ -616,19 +605,20 @@ function renderStart() {
   const quizPts = cfg.quizPoints ?? 10;
   const wordPts = cfg.wordPoints ?? 10;
   $app.innerHTML = `
-    <div class="screen">
-      ${renderHeader("PhonePe", "Quiz + Find the Word", `<span class="chip">${cfg.kioskResolution ?? "1920×1080"}</span>`)}
-      <div class="start-hero">
+    <div class="screen page-home">
+      ${renderHeader("PhonePe", "Quiz + Find the Word", `<span class="chip">Free to Play</span>`)}
+      <main class="start-hero page-main">
+        <p class="eyebrow">Interactive word puzzle</p>
         <h1>Quiz & <span>Find the Word</span></h1>
         <p class="lead">
           Answer <strong>3 questions</strong>, then find the <strong>same answer</strong> hidden in the puzzle grid.
-          Correct quiz answers earn points. Find the right answer for full word points — wrong selection gives 0.
+          Correct quiz answers earn points. Find the right answer for full word points.
         </p>
         <div class="steps">
           <div class="step">
             <div class="step-num">1</div>
             <div class="step-title">Answer the quiz</div>
-            <div class="step-desc">Tap the correct option · +${quizPts} pts if right</div>
+            <div class="step-desc">Choose the correct option · +${quizPts} pts</div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
@@ -638,23 +628,15 @@ function renderStart() {
           <div class="step">
             <div class="step-num">3</div>
             <div class="step-title">3 rounds total</div>
-            <div class="step-desc">Wrong word = 0 pts · Try again until time runs out</div>
+            <div class="step-desc">Wrong selection = 0 pts · Try again until time runs out</div>
           </div>
         </div>
-        <button class="btn btn-primary" data-start>Tap to Start</button>
-      </div>
-      <footer class="footer">
-        <span>Touch-only kiosk game</span>
-        <span>10 puzzle variants · no repeat for consecutive players</span>
-      </footer>
+        <button class="btn btn-primary" data-start>Start Game</button>
+      </main>
+      ${renderSiteFooter("Works on mobile, tablet & desktop", "Scroll · Tap · Play")}
     </div>
   `;
-  document.querySelector("[data-start]")?.addEventListener("pointerdown", () => {
-    try {
-      document.documentElement.requestFullscreen?.().catch(() => {});
-    } catch {}
-    startGame();
-  });
+  document.querySelector("[data-start]")?.addEventListener("click", () => startGame());
 }
 
 function renderQuiz() {
@@ -685,16 +667,16 @@ function renderQuiz() {
           <div class="quiz-options">${opts}</div>
         </div>
       </div>
-      <footer class="footer">
+      <footer class="footer page-footer">
         <span>Wrong answer moves to next question</span>
-        <span>Correct answer unlocks Find the Word</span>
+        <span>Correct answer unlocks the word puzzle</span>
       </footer>
       ${renderFeedback()}
     </div>
   `;
 
   document.querySelectorAll("[data-opt]").forEach((btn) => {
-    btn.addEventListener("pointerdown", () => answerQuiz(parseInt(btn.dataset.opt, 10)));
+    btn.addEventListener("click", () => answerQuiz(parseInt(btn.dataset.opt, 10)));
   });
 }
 
@@ -740,10 +722,7 @@ function renderWordFind() {
           </div>
         </div>
       </div>
-      <footer class="footer">
-        <span>${cfg.wordFindSeconds ?? 15} seconds per word search</span>
-        <span>8 directions · forwards or backwards</span>
-      </footer>
+      ${renderSiteFooter(`${cfg.wordFindSeconds ?? 15}s per puzzle`, "Drag across letters to select")}
       ${renderFeedback()}
     </div>
   `;
@@ -788,13 +767,10 @@ function renderEnd() {
           <button class="btn btn-primary" data-new>Play Again</button>
         </div>
       </div>
-      <footer class="footer">
-        <span>Puzzle variant #${state.puzzleVariant + 1} used</span>
-        <span>Next player gets a different puzzle</span>
-      </footer>
+      ${renderSiteFooter(`Puzzle variant #${state.puzzleVariant + 1}`, "New puzzle each session")}
     </div>
   `;
-  document.querySelector("[data-new]")?.addEventListener("pointerdown", () => startGame());
+  document.querySelector("[data-new]")?.addEventListener("click", () => startGame());
 }
 
 function render() {
@@ -891,7 +867,7 @@ function updateGridSelectionUI() {
 
 // ---- Boot ----
 (async function main() {
-  hardenKiosk();
+  initApp();
   try {
     cfg = await loadConfig();
     goStart();

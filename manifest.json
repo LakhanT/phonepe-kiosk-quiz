@@ -1,10 +1,9 @@
 {
-  "name": "PhonePe Kiosk Quiz",
-  "short_name": "PhonePe Kiosk",
+  "name": "PhonePe Quiz — Find the Word",
+  "short_name": "PhonePe Quiz",
   "start_url": "./index.html",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#F4F4F8",
   "theme_color": "#5F259F",
   "icons": []
 }
-

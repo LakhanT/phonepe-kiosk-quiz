@@ -1,4 +1,4 @@
-/* PhonePe Kiosk — modern minimalist theme */
+/* PhonePe Quiz — webpage theme */
 .app {
   --pp-purple: #5f259f;
   --pp-purple-dark: #4a1d7a;
@@ -36,9 +36,6 @@
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
 }
 
 *,
@@ -47,18 +44,22 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   background: var(--pp-bg);
-  overscroll-behavior: none;
-  touch-action: none;
+  color: var(--pp-text);
 }
 
 body {
   overflow-x: hidden;
   overflow-y: auto;
+  min-height: 100vh;
 }
 
 button {
@@ -67,12 +68,23 @@ button {
   cursor: pointer;
 }
 
-/* ── Layout shell ── */
+/* ── Page layout ── */
 .screen {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
+}
+
+.page-main {
+  flex: 1;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 16px rgba(95, 37, 159, 0.18);
 }
 
 .screen-body {
@@ -199,7 +211,34 @@ button {
   margin-bottom: var(--space-sm);
 }
 
-/* ── Start screen ── */
+/* ── Start / home page ── */
+.page-home .start-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: clamp(16px, 4vw, 32px);
+  margin: clamp(16px, 3vw, 32px) auto;
+  padding: clamp(28px, 5vw, 56px) clamp(16px, 4vw, 40px);
+  max-width: 860px;
+  width: calc(100% - clamp(24px, 4vw, 48px));
+  background: var(--pp-white);
+  border: 1px solid var(--pp-border);
+  border-radius: var(--pp-radius-lg);
+  box-shadow: var(--pp-shadow);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pp-purple);
+}
+
 .start-hero {
   flex: 1;
   display: flex;
@@ -317,7 +356,7 @@ button {
   background: var(--pp-bg);
 }
 
-/* ── Footer ── */
+/* ── Footers ── */
 .footer {
   display: flex;
   justify-content: space-between;
@@ -330,6 +369,23 @@ button {
   font-size: clamp(11px, 2.5vw, 12px);
   color: var(--pp-text-muted);
   flex-shrink: 0;
+}
+
+.site-footer {
+  background: var(--pp-white);
+  border-top: 1px solid var(--pp-border);
+  justify-content: center;
+  text-align: center;
+  gap: 6px 20px;
+  margin-top: auto;
+}
+
+.page-footer {
+  background: transparent;
+  border-top: 1px solid var(--pp-border);
+  max-width: var(--max-w);
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* ── Play layout ── */
