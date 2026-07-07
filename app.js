@@ -597,7 +597,7 @@ function buildGridHtml(gridData, interactive = true) {
   const selCells =
     interactive && state.selStart && state.selEnd ? cellsOnLine(state.selStart, state.selEnd) : [];
   const selSet = new Set(selCells.map((p) => `${p.r},${p.c}`));
-  let html = `<div class="grid${large}" data-grid style="grid-template-columns: repeat(${size}, 1fr)">`;
+  let html = `<div class="grid-scroll"><div class="grid${large}" data-grid data-cols="${size}" style="--cols:${size};grid-template-columns:repeat(${size},1fr)">`;
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       const key = `${r},${c}`;
@@ -607,7 +607,7 @@ function buildGridHtml(gridData, interactive = true) {
         aria-label="Letter ${cell.letter}">${cell.letter}</div>`;
     }
   }
-  html += `</div>`;
+  html += `</div></div>`;
   return html;
 }
 

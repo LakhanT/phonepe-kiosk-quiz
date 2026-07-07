@@ -24,8 +24,9 @@
   --space-lg: 24px;
   --space-xl: 32px;
   --space-2xl: 48px;
-  --header-h: 72px;
-  --max-w: 1280px;
+  --header-h: clamp(56px, 10vw, 72px);
+  --max-w: min(1280px, 100%);
+  --cell-max: clamp(28px, 7.5vw, 52px);
 
   min-height: 100vh;
   min-height: 100dvh;
@@ -56,7 +57,8 @@ body {
 }
 
 body {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 button {
@@ -77,7 +79,9 @@ button {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: var(--space-lg);
+  padding: clamp(12px, 3vw, 24px);
+  padding-left: max(clamp(12px, 3vw, 24px), env(safe-area-inset-left));
+  padding-right: max(clamp(12px, 3vw, 24px), env(safe-area-inset-right));
   max-width: var(--max-w);
   width: 100%;
   margin: 0 auto;
@@ -89,9 +93,12 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-md);
-  height: var(--header-h);
-  padding: 0 var(--space-lg);
+  gap: var(--space-sm);
+  min-height: var(--header-h);
+  height: auto;
+  padding: 10px max(clamp(12px, 3vw, 24px), env(safe-area-inset-right))
+    10px max(clamp(12px, 3vw, 24px), env(safe-area-inset-left));
+  padding-top: max(10px, env(safe-area-inset-top));
   background: var(--pp-purple);
   color: #fff;
   flex-shrink: 0;
@@ -174,12 +181,12 @@ button {
   background: var(--pp-white);
   border: 2px solid var(--pp-border-strong);
   border-radius: var(--pp-radius-lg);
-  padding: var(--space-xl);
+  padding: clamp(16px, 4vw, 32px);
   box-shadow: var(--pp-shadow);
 }
 
 .card-sm {
-  padding: var(--space-lg);
+  padding: clamp(12px, 3vw, 24px);
   border-radius: var(--pp-radius);
 }
 
@@ -200,8 +207,8 @@ button {
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: var(--space-xl);
-  padding: var(--space-2xl) var(--space-lg);
+  gap: clamp(16px, 4vw, 32px);
+  padding: clamp(20px, 5vw, 48px) clamp(12px, 3vw, 24px);
 }
 
 .start-hero h1 {
@@ -220,7 +227,7 @@ button {
 .start-hero .lead {
   margin: 0;
   max-width: 520px;
-  font-size: 17px;
+  font-size: clamp(14px, 3.5vw, 17px);
   color: var(--pp-text-secondary);
   line-height: 1.55;
 }
@@ -287,7 +294,8 @@ button {
 .btn-primary {
   background: var(--pp-purple);
   color: #fff;
-  min-width: 240px;
+  min-width: min(240px, 100%);
+  width: min(320px, 100%);
 }
 
 .btn-primary:active {
@@ -314,9 +322,12 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-sm) var(--space-lg) var(--space-md);
-  font-size: 12px;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: var(--space-sm) max(clamp(12px, 3vw, 24px), env(safe-area-inset-right))
+    max(var(--space-md), env(safe-area-inset-bottom))
+    max(clamp(12px, 3vw, 24px), env(safe-area-inset-left));
+  font-size: clamp(11px, 2.5vw, 12px);
   color: var(--pp-text-muted);
   flex-shrink: 0;
 }
@@ -325,20 +336,80 @@ button {
 .play-layout {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: var(--space-lg);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  gap: clamp(12px, 2.5vw, 24px);
   min-height: 0;
   align-items: start;
 }
 
-@media (max-width: 1024px) {
-  .play-layout {
+@media (max-width: 900px) {
+  .play-layout,
+  .wordfind-layout {
     grid-template-columns: 1fr;
   }
 
   .steps {
     grid-template-columns: 1fr;
-    max-width: 400px;
+    max-width: 100%;
+  }
+
+  .rules-card {
+    order: -1;
+  }
+
+  .footer {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .header-meta .chip:not(.chip-strong) {
+    display: none;
+  }
+
+  .title .sub {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 380px) {
+  .chip {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logo-mark {
+    width: 18px;
+    height: 18px;
+  }
+
+  .title .h1 {
+    font-size: 15px;
+  }
+
+  .opt-letter {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+
+  .timer-info .value {
+    font-size: 22px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .app {
+    --max-w: 1400px;
+    --cell-max: 56px;
+  }
+
+  .start-hero h1 {
+    font-size: 52px;
   }
 }
 
@@ -416,54 +487,64 @@ button {
   transition: width 0.12s linear, background 0.2s;
 }
 
-/* ── Grid ── */
+/* ── Grid — fluid across all screen sizes ── */
 .grid-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: var(--space-sm);
+  width: 100%;
+  min-width: 0;
+}
+
+.grid-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 0 6px;
 }
 
 .grid-hint {
-  font-size: 13px;
+  font-size: clamp(11px, 2.8vw, 13px);
   color: var(--pp-text-muted);
   text-align: center;
 }
 
 .grid {
   display: grid;
-  gap: 5px;
-  padding: 14px;
+  gap: clamp(2px, 0.6vw, 5px);
+  padding: clamp(8px, 2vw, 14px);
   background: var(--pp-grid-tray);
   border: 2px solid var(--pp-border-strong);
   border-radius: var(--pp-radius);
   touch-action: none;
-  width: fit-content;
+  width: 100%;
+  max-width: min(100%, calc(var(--cell-max) * var(--cols, 12) + 28px));
   margin: 0 auto;
+}
+
+.grid.large {
+  --cell-max: clamp(22px, 5.5vw, 38px);
+  max-width: min(100%, calc(var(--cell-max) * var(--cols, 16) + 28px));
 }
 
 .cell {
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 8px;
+  width: 100%;
+  aspect-ratio: 1;
+  min-width: 0;
+  min-height: 26px;
+  border-radius: clamp(4px, 1vw, 8px);
   border: 2px solid var(--pp-border-strong);
   background: var(--pp-white);
   color: var(--pp-text);
   font-weight: 700;
-  font-size: 18px;
+  font-size: clamp(10px, 2.6vw, 18px);
   box-shadow: 0 1px 3px rgba(28, 28, 40, 0.1);
   -webkit-tap-highlight-color: transparent;
   transition: background 0.1s, border-color 0.1s, color 0.1s, box-shadow 0.1s, transform 0.1s;
-}
-
-@media (max-width: 1024px) {
-  .cell {
-    width: 44px;
-    height: 44px;
-    font-size: 16px;
-  }
 }
 
 /* ── Grid cell states — high-contrast solid fills ── */
@@ -692,18 +773,19 @@ button {
 .quiz-option {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  min-height: 68px;
-  padding: var(--space-md) var(--space-lg);
+  gap: clamp(10px, 2.5vw, 16px);
+  min-height: clamp(56px, 14vw, 68px);
+  padding: clamp(12px, 3vw, 16px) clamp(14px, 3.5vw, 24px);
   border: 2px solid var(--pp-border-strong);
   border-radius: var(--pp-radius);
   background: var(--pp-white);
   text-align: left;
-  font-size: 16px;
+  font-size: clamp(14px, 3.5vw, 16px);
   font-weight: 600;
   color: var(--pp-text);
   box-shadow: 0 1px 4px rgba(28, 28, 40, 0.07);
   touch-action: manipulation;
+  width: 100%;
 }
 
 .quiz-option:active {
@@ -731,51 +813,39 @@ button {
 
 /* ── Word find screen ── */
 .wordfind-layout {
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
 }
 
 .find-target {
   text-align: center;
-  font-size: 18px;
+  font-size: clamp(14px, 3.5vw, 18px);
   font-weight: 600;
   color: var(--pp-text-secondary);
   margin-bottom: var(--space-md);
-  padding: var(--space-sm) var(--space-md);
+  padding: clamp(10px, 2.5vw, 14px) clamp(10px, 2.5vw, 16px);
   background: var(--pp-purple-soft);
   border: 2px solid var(--pp-purple);
   border-radius: var(--pp-radius-sm);
+  word-break: break-word;
 }
 
 .find-target strong {
   color: var(--pp-purple);
-  font-size: 20px;
+  font-size: clamp(16px, 4vw, 20px);
   font-weight: 800;
   display: block;
   margin-top: 4px;
+  line-height: 1.25;
 }
 
 .find-target-code {
   display: block;
   margin-top: 6px;
-  font-size: 13px;
+  font-size: clamp(10px, 2.5vw, 13px);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--pp-text-secondary);
-}
-
-.grid.large .cell {
-  width: 38px;
-  height: 38px;
-  font-size: 14px;
-  border-radius: 6px;
-}
-
-@media (max-width: 1024px) {
-  .grid.large .cell {
-    width: 32px;
-    height: 32px;
-    font-size: 12px;
-  }
+  word-break: break-all;
 }
 
 .rules-card {
@@ -818,16 +888,18 @@ button {
 /* ── Feedback overlay ── */
 .feedback {
   position: fixed;
-  bottom: 80px;
+  bottom: max(72px, calc(16px + env(safe-area-inset-bottom)));
   left: 50%;
   transform: translateX(-50%);
-  padding: 16px 28px;
+  padding: 14px 20px;
   border-radius: var(--pp-radius);
-  font-size: 17px;
+  font-size: clamp(14px, 3.5vw, 17px);
   font-weight: 700;
   z-index: 100;
   box-shadow: 0 4px 20px rgba(28, 28, 40, 0.18);
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  max-width: min(92vw, 420px);
 }
 
 .feedback-good {
@@ -853,7 +925,7 @@ button {
 }
 
 .final-score {
-  font-size: 72px;
+  font-size: clamp(48px, 12vw, 72px);
   font-weight: 900;
   color: var(--pp-purple);
   line-height: 1;
@@ -891,8 +963,3 @@ button {
   color: var(--pp-text-secondary);
 }
 
-@media (max-width: 1024px) {
-  .wordfind-layout {
-    grid-template-columns: 1fr;
-  }
-}
