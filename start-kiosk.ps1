@@ -6,7 +6,7 @@ Write-Host "Starting local server on port $port..."
 Start-Process -WindowStyle Hidden -FilePath "python" -ArgumentList @("-m", "http.server", "$port")
 Start-Sleep -Milliseconds 600
 
-$url = "http://localhost:$port"
+$url = "http://localhost:$port/?kiosk=1"
 
 Write-Host "Launching Edge in kiosk mode: $url"
 

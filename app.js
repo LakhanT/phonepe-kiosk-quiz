@@ -1,7 +1,36 @@
 const $app = document.getElementById("app");
 
-// ---- App init (offline cache only — normal webpage behavior) ----
-function initApp() {
+// ---- Kiosk hardening (only when ?kiosk=1) ----
+function shouldHardenKiosk() {
+  const params = new URLSearchParams(location.search);
+  if (params.get("kiosk") === "1") return true;
+  if (params.get("debug") === "1") return false;
+  return localStorage.getItem("phonepe_kiosk_mode") === "1";
+}
+
+function hardenKiosk() {
+  if (!shouldHardenKiosk()) return;
+
+  window.addEventListener("contextmenu", (e) => e.preventDefault(), { passive: false });
+  window.addEventListener("selectstart", (e) => e.preventDefault(), { passive: false });
+  window.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
+
+  try {
+    history.pushState(null, "", location.href);
+    window.addEventListener("popstate", () => history.pushState(null, "", location.href));
+  } catch {}
+
+  let lastTouchEnd = 0;
+  document.addEventListener(
+    "touchend",
+    (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 280) e.preventDefault();
+      lastTouchEnd = now;
+    },
+    { passive: false },
+  );
+
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
       .register("./sw.js", { updateViaCache: "none" })
@@ -432,6 +461,7 @@ function finishRound() {
   state.selStart = null;
   state.selEnd = null;
   clearGridHandlers();
+  unbindGridResize();
   state.questionIndex++;
 
   if (state.questionIndex >= cfg.questions.length) {
@@ -452,6 +482,7 @@ function endGame() {
 function goStart() {
   clearTimers();
   clearGridHandlers();
+  unbindGridResize();
   state.screen = Screen.START;
   state.questionIndex = 0;
   state.totalScore = 0;
@@ -513,7 +544,7 @@ function timerColor(ms, totalMs) {
 
 function renderHeader(title, subtitle, chips = "") {
   return `
-    <header class="header site-header">
+    <header class="header">
       <div class="brand">
         <div class="logo" aria-hidden="true"><div class="logo-mark"></div></div>
         <div class="title">
@@ -523,15 +554,6 @@ function renderHeader(title, subtitle, chips = "") {
       </div>
       <div class="header-meta">${chips}</div>
     </header>
-  `;
-}
-
-function renderSiteFooter(left = "PhonePe Quiz Game", right = "© PhonePe") {
-  return `
-    <footer class="footer site-footer">
-      <span>${left}</span>
-      <span>${right}</span>
-    </footer>
   `;
 }
 
@@ -586,7 +608,7 @@ function buildGridHtml(gridData, interactive = true) {
   const selCells =
     interactive && state.selStart && state.selEnd ? cellsOnLine(state.selStart, state.selEnd) : [];
   const selSet = new Set(selCells.map((p) => `${p.r},${p.c}`));
-  let html = `<div class="grid-scroll"><div class="grid${large}" data-grid data-cols="${size}" style="--cols:${size};grid-template-columns:repeat(${size},1fr)">`;
+  let html = `<div class="grid-scroll"><div class="grid${large}" data-grid data-cols="${size}" style="--cols:${size}">`;
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       const key = `${r},${c}`;
@@ -600,25 +622,67 @@ function buildGridHtml(gridData, interactive = true) {
   return html;
 }
 
+function getGridMetrics(cols) {
+  const isLarge = cols > 14;
+  const gap = isLarge ? 3 : 4;
+  const pad = 10;
+  const sidePad = Math.max(16, Math.min(32, window.innerWidth * 0.04));
+  const avail = window.innerWidth - sidePad * 2;
+  const minCell = isLarge ? 34 : 42;
+  const maxCell = 56;
+  let cell = Math.floor((avail - pad * 2 - gap * (cols - 1)) / cols);
+  if (cell < minCell) cell = minCell;
+  cell = Math.min(maxCell, cell);
+  const gridWidth = cols * cell + gap * (cols - 1) + pad * 2;
+  return { cell, gap, pad, cols, gridWidth, needsScroll: gridWidth > avail };
+}
+
+function applyGridLayout() {
+  const grid = document.querySelector("[data-grid]");
+  if (!grid) return;
+  const cols = parseInt(grid.dataset.cols, 10) || 12;
+  const m = getGridMetrics(cols);
+  grid.style.setProperty("--cell-size", `${m.cell}px`);
+  grid.style.setProperty("--grid-gap", `${m.gap}px`);
+  grid.style.padding = `${m.pad}px`;
+  grid.style.gridTemplateColumns = `repeat(${cols}, ${m.cell}px)`;
+  const scroll = grid.closest(".grid-scroll");
+  if (scroll) scroll.classList.toggle("grid-scroll-active", m.needsScroll);
+}
+
+let gridResizeHandler = null;
+function bindGridResize() {
+  if (gridResizeHandler) window.removeEventListener("resize", gridResizeHandler);
+  gridResizeHandler = () => {
+    if (state.screen === Screen.WORDFIND) applyGridLayout();
+  };
+  window.addEventListener("resize", gridResizeHandler);
+}
+function unbindGridResize() {
+  if (gridResizeHandler) {
+    window.removeEventListener("resize", gridResizeHandler);
+    gridResizeHandler = null;
+  }
+}
+
 function renderStart() {
   const wordSec = cfg.wordFindSeconds ?? 15;
   const quizPts = cfg.quizPoints ?? 10;
   const wordPts = cfg.wordPoints ?? 10;
   $app.innerHTML = `
-    <div class="screen page-home">
-      ${renderHeader("PhonePe", "Quiz + Find the Word", `<span class="chip">Free to Play</span>`)}
-      <main class="start-hero page-main">
-        <p class="eyebrow">Interactive word puzzle</p>
+    <div class="screen">
+      ${renderHeader("PhonePe", "Quiz + Find the Word", `<span class="chip">${cfg.kioskResolution ?? "1920×1080"}</span>`)}
+      <div class="start-hero">
         <h1>Quiz & <span>Find the Word</span></h1>
         <p class="lead">
           Answer <strong>3 questions</strong>, then find the <strong>same answer</strong> hidden in the puzzle grid.
-          Correct quiz answers earn points. Find the right answer for full word points.
+          Correct quiz answers earn points. Find the right answer for full word points — wrong selection gives 0.
         </p>
         <div class="steps">
           <div class="step">
             <div class="step-num">1</div>
             <div class="step-title">Answer the quiz</div>
-            <div class="step-desc">Choose the correct option · +${quizPts} pts</div>
+            <div class="step-desc">Tap the correct option · +${quizPts} pts if right</div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
@@ -628,15 +692,23 @@ function renderStart() {
           <div class="step">
             <div class="step-num">3</div>
             <div class="step-title">3 rounds total</div>
-            <div class="step-desc">Wrong selection = 0 pts · Try again until time runs out</div>
+            <div class="step-desc">Wrong word = 0 pts · Try again until time runs out</div>
           </div>
         </div>
-        <button class="btn btn-primary" data-start>Start Game</button>
-      </main>
-      ${renderSiteFooter("Works on mobile, tablet & desktop", "Scroll · Tap · Play")}
+        <button class="btn btn-primary" data-start>Tap to Start</button>
+      </div>
+      <footer class="footer">
+        <span>Touch-only kiosk game</span>
+        <span>10 puzzle variants · no repeat for consecutive players</span>
+      </footer>
     </div>
   `;
-  document.querySelector("[data-start]")?.addEventListener("click", () => startGame());
+  document.querySelector("[data-start]")?.addEventListener("pointerdown", () => {
+    try {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } catch {}
+    startGame();
+  });
 }
 
 function renderQuiz() {
@@ -667,16 +739,16 @@ function renderQuiz() {
           <div class="quiz-options">${opts}</div>
         </div>
       </div>
-      <footer class="footer page-footer">
+      <footer class="footer">
         <span>Wrong answer moves to next question</span>
-        <span>Correct answer unlocks the word puzzle</span>
+        <span>Correct answer unlocks Find the Word</span>
       </footer>
       ${renderFeedback()}
     </div>
   `;
 
   document.querySelectorAll("[data-opt]").forEach((btn) => {
-    btn.addEventListener("click", () => answerQuiz(parseInt(btn.dataset.opt, 10)));
+    btn.addEventListener("pointerdown", () => answerQuiz(parseInt(btn.dataset.opt, 10)));
   });
 }
 
@@ -702,7 +774,10 @@ function renderWordFind() {
               Find: <strong>${escapeHtml(answerLabel)}</strong>
               <span class="find-target-code">${escapeHtml(answerWord)}</span>
             </div>
-            <div class="grid-section">${gridHtml}</div>
+            <div class="grid-section">
+              <p class="scroll-note">Swipe sideways to see full puzzle →</p>
+              ${gridHtml}
+            </div>
             <p class="grid-hint">Drag across letters in a straight line · Release to submit</p>
           </div>
           <div class="card card-sm rules-card">
@@ -722,11 +797,18 @@ function renderWordFind() {
           </div>
         </div>
       </div>
-      ${renderSiteFooter(`${cfg.wordFindSeconds ?? 15}s per puzzle`, "Drag across letters to select")}
+      <footer class="footer">
+        <span>${cfg.wordFindSeconds ?? 15} seconds per word search</span>
+        <span>8 directions · forwards or backwards</span>
+      </footer>
       ${renderFeedback()}
     </div>
   `;
   attachGridHandlers();
+  requestAnimationFrame(() => {
+    applyGridLayout();
+    bindGridResize();
+  });
 }
 
 function renderEnd() {
@@ -767,10 +849,13 @@ function renderEnd() {
           <button class="btn btn-primary" data-new>Play Again</button>
         </div>
       </div>
-      ${renderSiteFooter(`Puzzle variant #${state.puzzleVariant + 1}`, "New puzzle each session")}
+      <footer class="footer">
+        <span>Puzzle variant #${state.puzzleVariant + 1} used</span>
+        <span>Next player gets a different puzzle</span>
+      </footer>
     </div>
   `;
-  document.querySelector("[data-new]")?.addEventListener("click", () => startGame());
+  document.querySelector("[data-new]")?.addEventListener("pointerdown", () => startGame());
 }
 
 function render() {
@@ -867,7 +952,7 @@ function updateGridSelectionUI() {
 
 // ---- Boot ----
 (async function main() {
-  initApp();
+  hardenKiosk();
   try {
     cfg = await loadConfig();
     goStart();

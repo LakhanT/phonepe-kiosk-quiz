@@ -1,4 +1,4 @@
-/* PhonePe Quiz — webpage theme */
+/* PhonePe Kiosk — modern minimalist theme */
 .app {
   --pp-purple: #5f259f;
   --pp-purple-dark: #4a1d7a;
@@ -36,6 +36,9 @@
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
 
 *,
@@ -44,22 +47,22 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 html,
 body {
   margin: 0;
   padding: 0;
   background: var(--pp-bg);
-  color: var(--pp-text);
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+html {
+  touch-action: manipulation;
 }
 
 body {
   overflow-x: hidden;
   overflow-y: auto;
-  min-height: 100vh;
 }
 
 button {
@@ -68,23 +71,12 @@ button {
   cursor: pointer;
 }
 
-/* ── Page layout ── */
+/* ── Layout shell ── */
 .screen {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
-}
-
-.page-main {
-  flex: 1;
-}
-
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 16px rgba(95, 37, 159, 0.18);
 }
 
 .screen-body {
@@ -211,34 +203,7 @@ button {
   margin-bottom: var(--space-sm);
 }
 
-/* ── Start / home page ── */
-.page-home .start-hero {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: clamp(16px, 4vw, 32px);
-  margin: clamp(16px, 3vw, 32px) auto;
-  padding: clamp(28px, 5vw, 56px) clamp(16px, 4vw, 40px);
-  max-width: 860px;
-  width: calc(100% - clamp(24px, 4vw, 48px));
-  background: var(--pp-white);
-  border: 1px solid var(--pp-border);
-  border-radius: var(--pp-radius-lg);
-  box-shadow: var(--pp-shadow);
-}
-
-.eyebrow {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--pp-purple);
-}
-
+/* ── Start screen ── */
 .start-hero {
   flex: 1;
   display: flex;
@@ -356,7 +321,7 @@ button {
   background: var(--pp-bg);
 }
 
-/* ── Footers ── */
+/* ── Footer ── */
 .footer {
   display: flex;
   justify-content: space-between;
@@ -369,23 +334,6 @@ button {
   font-size: clamp(11px, 2.5vw, 12px);
   color: var(--pp-text-muted);
   flex-shrink: 0;
-}
-
-.site-footer {
-  background: var(--pp-white);
-  border-top: 1px solid var(--pp-border);
-  justify-content: center;
-  text-align: center;
-  gap: 6px 20px;
-  margin-top: auto;
-}
-
-.page-footer {
-  background: transparent;
-  border-top: 1px solid var(--pp-border);
-  max-width: var(--max-w);
-  width: 100%;
-  margin: 0 auto;
 }
 
 /* ── Play layout ── */
@@ -409,13 +357,17 @@ button {
     max-width: 100%;
   }
 
-  .rules-card {
-    order: -1;
-  }
-
   .footer {
     flex-direction: column;
     text-align: center;
+  }
+
+  .wordfind-layout .card-sm:first-child {
+    order: 1;
+  }
+
+  .wordfind-layout .rules-card {
+    order: 2;
   }
 
   .header-meta .chip:not(.chip-strong) {
@@ -558,49 +510,69 @@ button {
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 2px 0 6px;
+  padding: 4px 0 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.grid-scroll-active {
+  justify-content: flex-start;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+  display: none;
+  font-size: 11px;
+  color: var(--pp-purple);
+  text-align: center;
+  font-weight: 600;
+}
+
+.grid-section:has(.grid-scroll-active) .scroll-note {
+  display: block;
 }
 
 .grid-hint {
-  font-size: clamp(11px, 2.8vw, 13px);
+  font-size: clamp(12px, 3vw, 14px);
   color: var(--pp-text-muted);
   text-align: center;
+  margin-top: 4px;
 }
 
 .grid {
   display: grid;
-  gap: clamp(2px, 0.6vw, 5px);
-  padding: clamp(8px, 2vw, 14px);
+  gap: var(--grid-gap, 4px);
+  padding: 10px;
   background: var(--pp-grid-tray);
   border: 2px solid var(--pp-border-strong);
   border-radius: var(--pp-radius);
   touch-action: none;
-  width: 100%;
-  max-width: min(100%, calc(var(--cell-max) * var(--cols, 12) + 28px));
+  width: max-content;
   margin: 0 auto;
+  grid-template-columns: repeat(var(--cols, 12), var(--cell-size, 42px));
 }
 
 .grid.large {
-  --cell-max: clamp(22px, 5.5vw, 38px);
-  max-width: min(100%, calc(var(--cell-max) * var(--cols, 16) + 28px));
+  /* sizing handled in JS */
 }
 
 .cell {
   display: grid;
   place-items: center;
-  width: 100%;
-  aspect-ratio: 1;
-  min-width: 0;
-  min-height: 26px;
-  border-radius: clamp(4px, 1vw, 8px);
+  width: var(--cell-size, 42px);
+  height: var(--cell-size, 42px);
+  min-width: var(--cell-size, 42px);
+  min-height: var(--cell-size, 42px);
+  border-radius: 8px;
   border: 2px solid var(--pp-border-strong);
   background: var(--pp-white);
   color: var(--pp-text);
   font-weight: 700;
-  font-size: clamp(10px, 2.6vw, 18px);
+  font-size: max(12px, calc(var(--cell-size, 42px) * 0.44));
   box-shadow: 0 1px 3px rgba(28, 28, 40, 0.1);
   -webkit-tap-highlight-color: transparent;
   transition: background 0.1s, border-color 0.1s, color 0.1s, box-shadow 0.1s, transform 0.1s;
+  line-height: 1;
 }
 
 /* ── Grid cell states — high-contrast solid fills ── */
