@@ -461,7 +461,6 @@ function finishRound() {
   state.selStart = null;
   state.selEnd = null;
   clearGridHandlers();
-  unbindGridResize();
   state.questionIndex++;
 
   if (state.questionIndex >= cfg.questions.length) {
@@ -482,7 +481,6 @@ function endGame() {
 function goStart() {
   clearTimers();
   clearGridHandlers();
-  unbindGridResize();
   state.screen = Screen.START;
   state.questionIndex = 0;
   state.totalScore = 0;
@@ -608,7 +606,7 @@ function buildGridHtml(gridData, interactive = true) {
   const selCells =
     interactive && state.selStart && state.selEnd ? cellsOnLine(state.selStart, state.selEnd) : [];
   const selSet = new Set(selCells.map((p) => `${p.r},${p.c}`));
-  let html = `<div class="grid-scroll"><div class="grid${large}" data-grid data-cols="${size}" style="--cols:${size}">`;
+  let html = `<div class="grid-fit"><div class="grid${large}" data-grid data-cols="${size}" style="--cols:${size}">`;
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       const key = `${r},${c}`;
@@ -620,50 +618,6 @@ function buildGridHtml(gridData, interactive = true) {
   }
   html += `</div></div>`;
   return html;
-}
-
-function getGridMetrics(cols) {
-  const isLarge = cols > 14;
-  const gap = isLarge ? 3 : 4;
-  const pad = 10;
-  const section = document.querySelector(".grid-section");
-  const containerW = section?.clientWidth || window.innerWidth;
-  const avail = Math.max(280, containerW - 8);
-  const minCell = isLarge ? 32 : 40;
-  const maxCell = 56;
-  let cell = Math.floor((avail - pad * 2 - gap * (cols - 1)) / cols);
-  if (cell < minCell) cell = minCell;
-  cell = Math.min(maxCell, cell);
-  const gridWidth = cols * cell + gap * (cols - 1) + pad * 2;
-  return { cell, gap, pad, cols, gridWidth, needsScroll: gridWidth > avail };
-}
-
-function applyGridLayout() {
-  const grid = document.querySelector("[data-grid]");
-  if (!grid) return;
-  const cols = parseInt(grid.dataset.cols, 10) || 12;
-  const m = getGridMetrics(cols);
-  grid.style.setProperty("--cell-size", `${m.cell}px`);
-  grid.style.setProperty("--grid-gap", `${m.gap}px`);
-  grid.style.padding = `${m.pad}px`;
-  grid.style.gridTemplateColumns = `repeat(${cols}, ${m.cell}px)`;
-  const scroll = grid.closest(".grid-scroll");
-  if (scroll) scroll.classList.toggle("grid-scroll-active", m.needsScroll);
-}
-
-let gridResizeHandler = null;
-function bindGridResize() {
-  if (gridResizeHandler) window.removeEventListener("resize", gridResizeHandler);
-  gridResizeHandler = () => {
-    if (state.screen === Screen.WORDFIND) applyGridLayout();
-  };
-  window.addEventListener("resize", gridResizeHandler);
-}
-function unbindGridResize() {
-  if (gridResizeHandler) {
-    window.removeEventListener("resize", gridResizeHandler);
-    gridResizeHandler = null;
-  }
 }
 
 function renderStart() {
@@ -777,7 +731,6 @@ function renderWordFind() {
               <span class="find-target-code">${escapeHtml(answerWord)}</span>
             </div>
             <div class="grid-section">
-              <p class="scroll-note">Swipe sideways to see full puzzle →</p>
               ${gridHtml}
             </div>
             <p class="grid-hint">Drag across letters in a straight line · Release to submit</p>
@@ -807,11 +760,6 @@ function renderWordFind() {
     </div>
   `;
   attachGridHandlers();
-  requestAnimationFrame(() => {
-    applyGridLayout();
-    requestAnimationFrame(applyGridLayout);
-    bindGridResize();
-  });
 }
 
 function renderEnd() {

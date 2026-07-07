@@ -535,31 +535,10 @@ button {
   overflow: hidden;
 }
 
-.grid-scroll {
+.grid-fit {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding: 4px 0 8px;
-  display: flex;
-  justify-content: center;
-}
-
-.grid-scroll-active {
-  justify-content: flex-start;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-  display: none;
-  font-size: 11px;
-  color: var(--pp-purple);
-  text-align: center;
-  font-weight: 600;
-}
-
-.grid-section:has(.grid-scroll-active) .scroll-note {
-  display: block;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .grid-hint {
@@ -571,38 +550,44 @@ button {
 
 .grid {
   display: grid;
-  gap: var(--grid-gap, 4px);
-  padding: 10px;
+  container-type: inline-size;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  gap: clamp(2px, 0.45vw, 4px);
+  padding: clamp(4px, 1.2vw, 10px);
   background: var(--pp-grid-tray);
   border: 2px solid var(--pp-border-strong);
   border-radius: var(--pp-radius);
   touch-action: none;
-  width: max-content;
-  margin: 0 auto;
-  grid-template-columns: repeat(var(--cols, 12), var(--cell-size, 42px));
+  grid-template-columns: repeat(var(--cols, 12), minmax(0, 1fr));
 }
 
 .grid.large {
-  /* sizing handled in JS */
+  gap: clamp(1px, 0.3vw, 3px);
+  padding: clamp(3px, 0.8vw, 8px);
 }
 
 .cell {
   display: grid;
   place-items: center;
-  width: var(--cell-size, 42px);
-  height: var(--cell-size, 42px);
-  min-width: var(--cell-size, 42px);
-  min-height: var(--cell-size, 42px);
-  border-radius: 8px;
-  border: 2px solid var(--pp-border-strong);
+  width: 100%;
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: clamp(3px, 0.8vw, 8px);
+  border: clamp(1px, 0.12em, 2px) solid var(--pp-border-strong);
   background: var(--pp-white);
   color: var(--pp-text);
   font-weight: 700;
-  font-size: max(12px, calc(var(--cell-size, 42px) * 0.44));
-  box-shadow: 0 1px 3px rgba(28, 28, 40, 0.1);
+  font-size: clamp(7px, calc(100cqi / var(--cols, 12) * 0.42), 18px);
+  box-shadow: 0 1px 2px rgba(28, 28, 40, 0.08);
   -webkit-tap-highlight-color: transparent;
   transition: background 0.1s, border-color 0.1s, color 0.1s, box-shadow 0.1s, transform 0.1s;
   line-height: 1;
+}
+
+.grid.large .cell {
+  border-radius: clamp(2px, 0.5vw, 5px);
 }
 
 /* ── Grid cell states — high-contrast solid fills ── */
@@ -611,7 +596,7 @@ button {
   border-color: var(--pp-purple-dark);
   color: #fff;
   box-shadow: 0 0 0 3px rgba(95, 37, 159, 0.35);
-  transform: scale(1.04);
+  transform: scale(1.02);
   z-index: 1;
   position: relative;
 }
