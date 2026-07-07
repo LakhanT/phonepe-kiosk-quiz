@@ -336,22 +336,34 @@ button {
   flex-shrink: 0;
 }
 
-/* ── Play layout ── */
-.play-layout {
+/* ── Play layout (mobile-first: stack) ── */
+.play-layout,
+.wordfind-layout {
   flex: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
-  gap: clamp(12px, 2.5vw, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2.5vw, 20px);
   min-height: 0;
-  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+.puzzle-card,
+.wordfind-layout > .card-sm {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 901px) {
+  .play-layout,
+  .wordfind-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+    align-items: start;
+  }
 }
 
 @media (max-width: 900px) {
-  .play-layout,
-  .wordfind-layout {
-    grid-template-columns: 1fr;
-  }
-
   .steps {
     grid-template-columns: 1fr;
     max-width: 100%;
@@ -362,20 +374,36 @@ button {
     text-align: center;
   }
 
-  .wordfind-layout .card-sm:first-child {
-    order: 1;
-  }
-
-  .wordfind-layout .rules-card {
-    order: 2;
-  }
-
   .header-meta .chip:not(.chip-strong) {
     display: none;
   }
 
   .title .sub {
     font-size: 11px;
+  }
+
+  .screen-body {
+    padding: 12px;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+
+  .card,
+  .card-sm {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .rules-card {
+    padding: 12px 14px;
+  }
+
+  .rules-list {
+    font-size: 13px;
+  }
+
+  .quiz-recap {
+    padding-top: 10px;
   }
 }
 
@@ -502,7 +530,9 @@ button {
   align-items: stretch;
   gap: var(--space-sm);
   width: 100%;
+  max-width: 100%;
   min-width: 0;
+  overflow: hidden;
 }
 
 .grid-scroll {
@@ -840,40 +870,43 @@ button {
 }
 
 /* ── Word find screen ── */
-.wordfind-layout {
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
-}
-
 .find-target {
   text-align: center;
   font-size: clamp(14px, 3.5vw, 18px);
   font-weight: 600;
   color: var(--pp-text-secondary);
   margin-bottom: var(--space-md);
-  padding: clamp(10px, 2.5vw, 14px) clamp(10px, 2.5vw, 16px);
+  padding: 12px 14px;
   background: var(--pp-purple-soft);
   border: 2px solid var(--pp-purple);
   border-radius: var(--pp-radius-sm);
-  word-break: break-word;
+}
+
+.find-target-label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
 }
 
 .find-target strong {
   color: var(--pp-purple);
-  font-size: clamp(16px, 4vw, 20px);
+  font-size: clamp(17px, 4.5vw, 20px);
   font-weight: 800;
   display: block;
-  margin-top: 4px;
-  line-height: 1.25;
+  line-height: 1.3;
+  word-break: normal;
 }
 
 .find-target-code {
   display: block;
-  margin-top: 6px;
-  font-size: clamp(10px, 2.5vw, 13px);
+  margin-top: 8px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--pp-text-secondary);
-  word-break: break-all;
+  letter-spacing: 0.05em;
+  color: var(--pp-text-muted);
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
 }
 
 .rules-card {

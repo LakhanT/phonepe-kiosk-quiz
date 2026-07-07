@@ -626,9 +626,10 @@ function getGridMetrics(cols) {
   const isLarge = cols > 14;
   const gap = isLarge ? 3 : 4;
   const pad = 10;
-  const sidePad = Math.max(16, Math.min(32, window.innerWidth * 0.04));
-  const avail = window.innerWidth - sidePad * 2;
-  const minCell = isLarge ? 34 : 42;
+  const section = document.querySelector(".grid-section");
+  const containerW = section?.clientWidth || window.innerWidth;
+  const avail = Math.max(280, containerW - 8);
+  const minCell = isLarge ? 32 : 40;
   const maxCell = 56;
   let cell = Math.floor((avail - pad * 2 - gap * (cols - 1)) / cols);
   if (cell < minCell) cell = minCell;
@@ -768,10 +769,11 @@ function renderWordFind() {
       )}
       <div class="screen-body">
         <div class="play-layout wordfind-layout">
-          <div class="card card-sm">
+          <div class="card card-sm puzzle-card">
             <div data-timer-host>${renderTimerBlock(state.remainingMs, totalMs)}</div>
             <div class="find-target">
-              Find: <strong>${escapeHtml(answerLabel)}</strong>
+              <span class="find-target-label">Find this answer in the grid</span>
+              <strong>${escapeHtml(answerLabel)}</strong>
               <span class="find-target-code">${escapeHtml(answerWord)}</span>
             </div>
             <div class="grid-section">
@@ -807,6 +809,7 @@ function renderWordFind() {
   attachGridHandlers();
   requestAnimationFrame(() => {
     applyGridLayout();
+    requestAnimationFrame(applyGridLayout);
     bindGridResize();
   });
 }
