@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "phonepe-kiosk",
   "headers": [
     {
       "source": "/sw.js",
