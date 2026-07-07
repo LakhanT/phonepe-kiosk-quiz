@@ -624,13 +624,14 @@ function renderStart() {
   const wordSec = cfg.wordFindSeconds ?? 15;
   const quizPts = cfg.quizPoints ?? 10;
   const wordPts = cfg.wordPoints ?? 10;
+  const roundCount = cfg.questions.length;
   $app.innerHTML = `
     <div class="screen">
       ${renderHeader("PhonePe", "Quiz + Find the Word", `<span class="chip">${cfg.kioskResolution ?? "1920×1080"}</span>`)}
       <div class="start-hero">
         <h1>Quiz & <span>Find the Word</span></h1>
         <p class="lead">
-          Answer <strong>3 questions</strong>, then find the <strong>same answer</strong> hidden in the puzzle grid.
+          Answer <strong>${roundCount} questions</strong>, then find the <strong>same answer</strong> hidden in the puzzle grid.
           Correct quiz answers earn points. Find the right answer for full word points — wrong selection gives 0.
         </p>
         <div class="steps">
@@ -646,7 +647,7 @@ function renderStart() {
           </div>
           <div class="step">
             <div class="step-num">3</div>
-            <div class="step-title">3 rounds total</div>
+            <div class="step-title">${roundCount} rounds total</div>
             <div class="step-desc">Wrong word = 0 pts · Try again until time runs out</div>
           </div>
         </div>

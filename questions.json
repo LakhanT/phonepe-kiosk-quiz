@@ -7,39 +7,64 @@
   "wordPoints": 10,
   "puzzleVariants": 10,
   "decoyWords": [
-    "WALLET", "NEFT", "IMPS", "SCAN", "BANK", "CASH", "OTP",
-    "PAY", "CARD", "LOAN", "BILL", "SEND", "SHOP", "VPA", "BHIM"
+    "NEFT", "IMPS", "CASH", "CARD", "LOAN", "SHOP", "VPA", "BHIM",
+    "TAP", "UPI", "NET", "FEE", "TAX", "GOLD", "SALE", "DEAL"
   ],
   "grid": {
     "minSize": 10,
-    "maxSize": 24
+    "maxSize": 14
   },
   "questions": [
     {
-      "clue": "What does UPI stand for?",
-      "options": [
-        "Unified Payments Interface",
-        "Universal Payment Index",
-        "United Pay Integration"
-      ],
+      "clue": "Which payment system does PhonePe use?",
+      "options": ["UPI", "NEFT", "COD"],
       "correctIndex": 0
     },
     {
-      "clue": "What is the most common way to pay by scanning at a shop?",
-      "options": [
-        "QR Code",
-        "Barcode",
-        "NFC Tag"
-      ],
+      "clue": "What do you scan to pay at a shop?",
+      "options": ["QR Code", "Barcode", "Receipt"],
+      "correctIndex": 0,
+      "answer": "QR"
+    },
+    {
+      "clue": "What 4-digit code protects your payments?",
+      "options": ["PIN", "OTP", "CVV"],
       "correctIndex": 0
     },
     {
-      "clue": "What 4-digit secret code secures your PhonePe transactions?",
-      "options": [
-        "UPI PIN",
-        "OTP",
-        "CVV"
-      ],
+      "clue": "Where is your PhonePe balance stored?",
+      "options": ["Wallet", "Locker", "Pocket"],
+      "correctIndex": 0
+    },
+    {
+      "clue": "What SMS code verifies your phone number?",
+      "options": ["OTP", "PIN", "ATM"],
+      "correctIndex": 0
+    },
+    {
+      "clue": "What do you do with your camera to pay?",
+      "options": ["Scan", "Call", "Record"],
+      "correctIndex": 0
+    },
+    {
+      "clue": "What can you pay using PhonePe?",
+      "options": ["Bills", "Books", "Tickets"],
+      "correctIndex": 0,
+      "answer": "BILL"
+    },
+    {
+      "clue": "How do you move money to a friend?",
+      "options": ["Send", "Post", "Print"],
+      "correctIndex": 0
+    },
+    {
+      "clue": "What button completes a payment?",
+      "options": ["Pay", "Skip", "Exit"],
+      "correctIndex": 0
+    },
+    {
+      "clue": "What does PhonePe link to for payments?",
+      "options": ["Bank", "Post", "Mail"],
       "correctIndex": 0
     }
   ]
