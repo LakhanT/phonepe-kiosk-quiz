@@ -337,6 +337,8 @@ let state = {
   selStart: null,
   selEnd: null,
   locked: false,
+  quizReveal: null,
+  revealTarget: false,
 };
 
 function activeQuestion() {
@@ -387,6 +389,8 @@ function startGame() {
   state.gridData = null;
   state.feedback = null;
   state.locked = false;
+  state.quizReveal = null;
+  state.revealTarget = false;
   state.screen = Screen.QUIZ;
   render();
 }
@@ -444,26 +448,63 @@ async function answerQuiz(optionIndex) {
   const q = activeQuestion();
   const correct = optionIndex === q.correctIndex;
   const quizPts = correct ? (cfg.quizPoints ?? 10) : 0;
+  const correctLabel = getAnswerLabel(q);
 
   state.currentRound = { quiz: quizPts, word: 0, quizCorrect: correct };
+  state.quizReveal = { picked: optionIndex, correct: q.correctIndex };
 
   if (!correct) {
     beep("bad");
-    state.feedback = { type: "bad", text: "Incorrect — moving to next question" };
+    state.feedback = {
+      type: "bad",
+      text: `Incorrect — correct answer: ${correctLabel}`,
+    };
     render();
-    await delay(1400);
+    await delay(2600);
     state.feedback = null;
+    state.quizReveal = null;
     finishRound();
     return;
   }
 
   beep("good");
-  state.feedback = { type: "good", text: `Correct! +${quizPts} points — find the category` };
+  state.feedback = { type: "good", text: `Correct! +${quizPts} points — find the keyword` };
   render();
   await delay(1100);
   if (state.screen !== Screen.QUIZ) return;
   state.feedback = null;
+  state.quizReveal = null;
   startWordFind();
+}
+
+function getTargetPlacementCells() {
+  const place = state.gridData?.placements?.[0];
+  return place?.cells ?? [];
+}
+
+function paintTargetReveal() {
+  const cells = getTargetPlacementCells();
+  const set = new Set(cells.map((p) => `${p.r},${p.c}`));
+  document.querySelectorAll("[data-cell]").forEach((el) => {
+    const key = el.getAttribute("data-cell");
+    el.classList.toggle("reveal", set.has(key));
+    el.classList.remove("sel");
+  });
+}
+
+async function revealKeywordThenFinish(message, type = "bad", waitMs = 2800) {
+  state.revealTarget = true;
+  state.selecting = false;
+  state.selStart = null;
+  state.selEnd = null;
+  state.feedback = { type, text: message };
+  render();
+  paintTargetReveal();
+  await delay(waitMs);
+  if (state.screen !== Screen.WORDFIND) return;
+  state.feedback = null;
+  state.revealTarget = false;
+  finishRound();
 }
 
 function onWordFindTimeout() {
@@ -471,12 +512,8 @@ function onWordFindTimeout() {
   state.locked = true;
   clearTimers();
   state.currentRound.word = 0;
-  state.feedback = { type: "bad", text: "Time's up — no word points" };
-  render();
-  setTimeout(() => {
-    state.feedback = null;
-    finishRound();
-  }, 1400);
+  const label = getCategoryLabel(activeQuestion());
+  void revealKeywordThenFinish(`Time's up — correct keyword highlighted: ${label}`);
 }
 
 async function onWordSelected(matchIdx) {
@@ -485,36 +522,38 @@ async function onWordSelected(matchIdx) {
 
   const full = cfg.wordPoints ?? 10;
   const quizPts = state.currentRound.quiz ?? 0;
+  const label = getCategoryLabel(activeQuestion());
 
   if (matchIdx === 0) {
-    // Correct category keyword → full word points
     clearTimers();
     beep("good");
     state.currentRound.word = full;
-    state.feedback = { type: "good", text: `Category found! +${full} points` };
+    state.revealTarget = true;
+    state.feedback = { type: "good", text: `Keyword found! +${full} points` };
     render();
+    paintTargetReveal();
+    document.querySelectorAll(".cell.reveal").forEach((el) => {
+      el.classList.remove("reveal");
+      el.classList.add("foundA");
+    });
     await delay(1300);
     if (state.screen !== Screen.WORDFIND) return;
     state.feedback = null;
+    state.revealTarget = false;
     finishRound();
     return;
   }
 
   if (matchIdx > 0) {
-    // Rule #5: correct quiz + incorrect category → only half the points (of the round total)
     clearTimers();
     beep("bad");
     const halfTotal = halfPoints(quizPts + full);
     state.currentRound.word = Math.max(0, halfTotal - quizPts);
-    state.feedback = {
-      type: "warn",
-      text: `Wrong category — half points only (+${halfTotal} total)`,
-    };
-    render();
-    await delay(1400);
-    if (state.screen !== Screen.WORDFIND) return;
-    state.feedback = null;
-    finishRound();
+    await revealKeywordThenFinish(
+      `Wrong keyword — half points (+${halfTotal}). Correct: ${label}`,
+      "warn",
+      3000,
+    );
     return;
   }
 
@@ -523,6 +562,7 @@ async function onWordSelected(matchIdx) {
   state.selStart = null;
   state.selEnd = null;
   state.feedback = { type: "bad", text: "Not a valid word — try again" };
+  flashBad();
   render();
   await delay(900);
   if (state.screen !== Screen.WORDFIND) return;
@@ -542,6 +582,8 @@ function finishRound() {
   state.selecting = false;
   state.selStart = null;
   state.selEnd = null;
+  state.quizReveal = null;
+  state.revealTarget = false;
   clearGridHandlers();
   state.questionIndex++;
 
@@ -572,6 +614,8 @@ function goStart() {
   state.gridData = null;
   state.feedback = null;
   state.locked = false;
+  state.quizReveal = null;
+  state.revealTarget = false;
   render();
 }
 
@@ -690,13 +734,18 @@ function buildGridHtml(gridData, interactive = true) {
   const selCells =
     interactive && state.selStart && state.selEnd ? cellsOnLine(state.selStart, state.selEnd) : [];
   const selSet = new Set(selCells.map((p) => `${p.r},${p.c}`));
+  const revealSet = state.revealTarget
+    ? new Set(getTargetPlacementCells().map((p) => `${p.r},${p.c}`))
+    : new Set();
   let html = `<div class="grid-fit"><div class="grid${large}" data-grid data-cols="${size}" style="--cols:${size}">`;
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       const key = `${r},${c}`;
       const cell = gridData.grid[r][c];
       const isSel = selSet.has(key);
-      html += `<div class="cell ${isSel ? "sel" : ""}" data-cell="${r},${c}" role="button"
+      const isReveal = revealSet.has(key);
+      const cls = [isSel ? "sel" : "", isReveal ? "reveal" : ""].filter(Boolean).join(" ");
+      html += `<div class="cell ${cls}" data-cell="${r},${c}" role="button"
         aria-label="Letter ${cell.letter}">${cell.letter}</div>`;
     }
   }
@@ -757,14 +806,21 @@ function renderStart() {
 function renderQuiz() {
   const q = activeQuestion();
   const total = state.roundQuestions.length;
+  const reveal = state.quizReveal;
   const opts = getQuizOptions(q)
-    .map(
-      (opt, i) => `
-      <button class="quiz-option" data-opt="${i}" type="button">
+    .map((opt, i) => {
+      let extra = "";
+      if (reveal) {
+        if (i === reveal.correct) extra = " quiz-option-correct";
+        else if (i === reveal.picked) extra = " quiz-option-wrong";
+        else extra = " quiz-option-dim";
+      }
+      return `
+      <button class="quiz-option${extra}" data-opt="${i}" type="button" ${reveal ? "disabled" : ""}>
         <span class="opt-letter">${String.fromCharCode(65 + i)}</span>
         <span class="opt-text">${escapeHtml(opt)}</span>
-      </button>`,
-    )
+      </button>`;
+    })
     .join("");
 
   $app.innerHTML = `
@@ -778,7 +834,13 @@ function renderQuiz() {
         <div class="card card-sm quiz-card">
           <div class="section-label">${escapeHtml(q.allegation || "Integrity")} · Round ${state.questionIndex + 1}</div>
           <h2 class="quiz-question">${escapeHtml(q.clue)}</h2>
-          <p class="quiz-hint">Tap the correct answer (A / B from question bank, or C)</p>
+          <p class="quiz-hint">${
+            reveal
+              ? reveal.picked === reveal.correct
+                ? "Correct!"
+                : "Incorrect — green option is the correct answer"
+              : "Tap the correct answer (A / B from question bank, or C)"
+          }</p>
           <div class="quiz-options">${opts}</div>
         </div>
       </div>
@@ -790,9 +852,11 @@ function renderQuiz() {
     </div>
   `;
 
-  document.querySelectorAll("[data-opt]").forEach((btn) => {
-    btn.addEventListener("pointerdown", () => answerQuiz(parseInt(btn.dataset.opt, 10)));
-  });
+  if (!reveal) {
+    document.querySelectorAll("[data-opt]").forEach((btn) => {
+      btn.addEventListener("pointerdown", () => answerQuiz(parseInt(btn.dataset.opt, 10)));
+    });
+  }
 }
 
 function renderWordFind() {
@@ -803,7 +867,7 @@ function renderWordFind() {
   const totalMs = (cfg.wordFindSeconds ?? 15) * 1000;
   const half = halfPoints((cfg.quizPoints ?? 10) + (cfg.wordPoints ?? 10));
   const keywordCount = state.gridData?.words?.length ?? state.roundQuestions.length;
-  const gridHtml = buildGridHtml(state.gridData, true);
+  const gridHtml = buildGridHtml(state.gridData, !state.revealTarget);
 
   $app.innerHTML = `
     <div class="screen">

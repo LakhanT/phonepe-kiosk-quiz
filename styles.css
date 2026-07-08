@@ -623,12 +623,48 @@ button {
 }
 
 .cell.reveal {
-  background: #fef2f2;
-  border-color: var(--pp-bad);
-  color: var(--pp-bad);
-  outline: 3px solid var(--pp-bad);
-  outline-offset: -1px;
-  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25);
+  background: #16a34a;
+  border-color: #15803d;
+  color: #fff;
+  outline: 3px solid rgba(22, 163, 74, 0.55);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.35);
+  animation: revealPulse 0.7s ease-in-out 2;
+  z-index: 2;
+  position: relative;
+}
+
+@keyframes revealPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.quiz-option-correct {
+  background: #dcfce7 !important;
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.25);
+}
+
+.quiz-option-correct .opt-letter {
+  background: #16a34a !important;
+}
+
+.quiz-option-wrong {
+  background: #fee2e2 !important;
+  border-color: #dc2626 !important;
+  opacity: 0.95;
+}
+
+.quiz-option-wrong .opt-letter {
+  background: #dc2626 !important;
+}
+
+.quiz-option-dim {
+  opacity: 0.45;
+}
+
+.quiz-option:disabled {
+  pointer-events: none;
 }
 
 .flashBad .cell.sel {
