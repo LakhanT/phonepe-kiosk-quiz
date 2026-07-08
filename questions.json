@@ -1,71 +1,1048 @@
 {
   "orientation": "landscape",
   "kioskResolution": "1920x1080",
+  "roundsPerGame": 3,
   "wordFindSeconds": 15,
   "idleResetSeconds": 10,
   "quizPoints": 10,
   "wordPoints": 10,
   "puzzleVariants": 10,
   "decoyWords": [
-    "NEFT", "IMPS", "CASH", "CARD", "LOAN", "SHOP", "VPA", "BHIM",
-    "TAP", "UPI", "NET", "FEE", "TAX", "GOLD", "SALE", "DEAL"
+    "ALCOHOLFREEWORK",
+    "ANTIBRIBERY",
+    "ANTITRUST",
+    "BRIBERY",
+    "BUSINESSINFORMATION",
+    "CODEOFCONDUCT",
+    "COMPLIANCE",
+    "CONFLICT",
+    "CONFLICTOFINTEREST",
+    "DISCRIMINATION",
+    "ENVIRONMENT",
+    "ESCALATION",
+    "ETHICS",
+    "FINANCIALINTEGRITY",
+    "FRAUD",
+    "HARASSMENT",
+    "ITCOMPLIANCE",
+    "LABOURCOMPLIANCE",
+    "LAUNDERING",
+    "LICENSE",
+    "PERMITS",
+    "POLICY",
+    "PRIVACY",
+    "REGULATIONS",
+    "RETALIATION",
+    "SAFETY",
+    "SAFEWORKPLACE",
+    "SANCTIONS",
+    "TIPPINGOFF",
+    "WORKPLACE"
   ],
   "grid": {
-    "minSize": 10,
-    "maxSize": 14
+    "minSize": 12,
+    "maxSize": 22
   },
   "questions": [
     {
-      "clue": "Which payment system does PhonePe use?",
-      "options": ["UPI", "NEFT", "COD"],
-      "correctIndex": 0
-    },
-    {
-      "clue": "What do you scan to pay at a shop?",
-      "options": ["QR Code", "Barcode", "Receipt"],
+      "allegation": "Alcohol and Drug",
+      "clue": "We are heading out for a team lunch and will be coming back to the office afterwards. It's happy hour - can we have a small alcoholic drink?",
+      "options": [
+        "No, working under the influence is not allowed.",
+        "Yes, as long as it's within permissible limits and outside office premises."
+      ],
       "correctIndex": 0,
-      "answer": "QR"
+      "categoryWord": "ALCOHOL FREE WORK"
     },
     {
-      "clue": "What 4-digit code protects your payments?",
-      "options": ["PIN", "OTP", "CVV"],
-      "correctIndex": 0
-    },
-    {
-      "clue": "Where is your PhonePe balance stored?",
-      "options": ["Wallet", "Locker", "Pocket"],
-      "correctIndex": 0
-    },
-    {
-      "clue": "What SMS code verifies your phone number?",
-      "options": ["OTP", "PIN", "ATM"],
-      "correctIndex": 0
-    },
-    {
-      "clue": "What do you do with your camera to pay?",
-      "options": ["Scan", "Call", "Record"],
-      "correctIndex": 0
-    },
-    {
-      "clue": "What can you pay using PhonePe?",
-      "options": ["Bills", "Books", "Tickets"],
+      "allegation": "AML / Sanctions",
+      "clue": "What are the primary stages involved in the process of money laundering?",
+      "options": [
+        "Placement, Layering, Integration",
+        "Placement, Layering, Structuring, Integration"
+      ],
       "correctIndex": 0,
-      "answer": "BILL"
+      "categoryWord": "LAUNDERING"
     },
     {
-      "clue": "How do you move money to a friend?",
-      "options": ["Send", "Post", "Print"],
-      "correctIndex": 0
+      "allegation": "AML / Sanctions",
+      "clue": "What is the term for \"informing a customer about a suspicious activity investigation on their account\"?",
+      "options": [
+        "Tipping off",
+        "Customer Notification"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "TIPPING OFF"
     },
     {
-      "clue": "What button completes a payment?",
-      "options": ["Pay", "Skip", "Exit"],
-      "correctIndex": 0
+      "allegation": "AML / Sanctions",
+      "clue": "Under which key legislation in India are Know Your Customer (KYC) regulations primarily mandated for financial institutions?",
+      "options": [
+        "SEBI Act",
+        "Prevention of Money Laundering Act"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "COMPLIANCE"
     },
     {
-      "clue": "What does PhonePe link to for payments?",
-      "options": ["Bank", "Post", "Mail"],
-      "correctIndex": 0
+      "allegation": "AML / Sanctions",
+      "clue": "The process of making illegally obtained funds appear legitimate & clean is known as _________.",
+      "options": [
+        "Money laundering",
+        "Identity theft"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "LAUNDERING"
+    },
+    {
+      "allegation": "AML / Sanctions",
+      "clue": "What is the primary purpose of PhonePe's KYC policy?",
+      "options": [
+        "To attract a large number of new customers quickly.",
+        "To conduct due diligence, crucial for vetting potential customers."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "COMPLIANCE"
+    },
+    {
+      "allegation": "AML / Sanctions",
+      "clue": "When are PhonePe-rs expected to report suspicious activities?",
+      "options": [
+        "Only if a large sum of money is involved.",
+        "If you suspect a customer is involved in money laundering or terrorist financing."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "ESCALATION"
+    },
+    {
+      "allegation": "AML / Sanctions",
+      "clue": "You receive an anonymous tip alleging that a vendor intentionally falsified import documents to conceal the actual value of goods. What type of violation does this most likely represent?",
+      "options": [
+        "Trade Non-Compliance",
+        "Insider Trading"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "COMPLIANCE"
+    },
+    {
+      "allegation": "AML / Sanctions",
+      "clue": "PhonePe's Global Trade Compliance Policy prohibits conducting business with which of the following?",
+      "options": [
+        "New start-ups in emerging markets.",
+        "Individuals or entities identified as sanctioned by applicable law."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "SANCTIONS"
+    },
+    {
+      "allegation": "AML / Sanctions",
+      "clue": "Who is responsible for following PhonePe's Trade Compliance Policy?",
+      "options": [
+        "Only the Trade Compliance team.",
+        "Employees who oversee or support imports/exports, including product development, buying, sourcing, logistics, etc."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "SANCTIONS"
+    },
+    {
+      "allegation": "AML / Sanctions",
+      "clue": "What is the full form of KYC as per RBI?",
+      "options": [
+        "Know Your Customer",
+        "Know Your Client"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "REGULATIONS"
+    },
+    {
+      "allegation": "Antitrust",
+      "clue": "An employee is approached by a competitor at a supplier event. The competitor suggests that they should agree on pricing and the employee accepts. Identify the violation.",
+      "options": [
+        "Antitrust",
+        "Bribery"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "ANTITRUST"
+    },
+    {
+      "allegation": "Bribery",
+      "clue": "A PhonePe-r knew about possible bribery but did not inform Ethics. What violation did the employee commit?",
+      "options": [
+        "Corruption",
+        "Failure to Report"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "ANTI BRIBERY"
+    },
+    {
+      "allegation": "Bribery",
+      "clue": "An invoice for marketing licenses contains a line item for \"Miscellaneous Expenses\" totalling INR 500, lacking supporting documentation. How should you proceed?",
+      "options": [
+        "Do not process the invoice. Return it for further details and explanation.",
+        "Complete processing since the expense is minor and will not make a difference."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "BRIBERY"
+    },
+    {
+      "allegation": "Bribery",
+      "clue": "While working on a project, a police supervisor suggests paying a \"small tip\" to ensure quicker response times from assigned officers. How should you proceed?",
+      "options": [
+        "Pay the \"tip\" as it is a customary local practice.",
+        "Refuse to pay the \"tip\" and report solicitation to Ethics immediately."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "ANTI BRIBERY"
+    },
+    {
+      "allegation": "Bribery",
+      "clue": "A government officer requests a donation to his private foundation, stating it would significantly expedite your project's progress. What should you do?",
+      "options": [
+        "Decline the request, but no need report it as no bribe exchange took place.",
+        "Decline bribe solicitation and immediately report it to Ethics."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "BRIBERY"
+    },
+    {
+      "allegation": "Bribery",
+      "clue": "With the festive season approaching, your team is considering sending the SEBI Officer a \"PhonePe Gift Card\" to build business relations. Is this allowed?",
+      "options": [
+        "No, we never bribe to influence the actions of government officials/officers.",
+        "Till the time the gift card value is under INR 1000 value."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "BRIBERY"
+    },
+    {
+      "allegation": "Bribery",
+      "clue": "PhonePe's Anti-Corruption Compliance Procedures outline the process for engaging Third-Party Intermediaries (\"TPIs\"). Which option below qualifies as a TPI?",
+      "options": [
+        "A vendor that interacts with a government official / entity on PhonePe's behalf.",
+        "A software vendor that interacts only with PhonePe employees."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "BRIBERY"
+    },
+    {
+      "allegation": "Bribery",
+      "clue": "What types of \"donations\" are prohibited as per PhonePe's Anti-Corruption Policy?",
+      "options": [
+        "Food, Goods, and Services, such as volunteering.",
+        "Physical cash, gift cards, alcohol, and tobacco."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "ANTI BRIBERY"
+    },
+    {
+      "allegation": "Bribery",
+      "clue": "A government official offered to ensure PhonePe faces \"no hassle in any regulatory audits\" if his daughter's resume was forwarded to the recruiting team. What should you do?",
+      "options": [
+        "Accept the resume and forward it to the recruiting team as requested.",
+        "Decline the offer and report it to Ethics."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "ANTI BRIBERY"
+    },
+    {
+      "allegation": "CoC",
+      "clue": "The three Immediately Reportable Criteria (IRCs) per the Code of Conduct are: 1. Bribery 2. Financial Integrity 3. ________________",
+      "options": [
+        "Any violation of Code by CEO or CEO's direct reports.",
+        "Sexual harassment"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CODE OF CONDUCT"
+    },
+    {
+      "allegation": "CoC",
+      "clue": "You can reach out to Ethics by 1. Visiting: www.phonepeethics.com, 2. Calling: 1800-102-1482, or 3. Emailing: __________________.",
+      "options": [
+        "ethics@phonepe.com",
+        "phonepe@ethics.com"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CODE OF CONDUCT"
+    },
+    {
+      "allegation": "COC",
+      "clue": "The Code of Conduct applies to _____________.",
+      "options": [
+        "All PhonePe employees, subsidiaries, and board members acting in their director capacity.",
+        "All PhonePe employees and subsidiaries except the leadership and board members."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CODE OF CONDUCT"
+    },
+    {
+      "allegation": "Code of Conduct",
+      "clue": "How can I reach out to the Ethics team?",
+      "options": [
+        "By emailing ethics@phonepe.com or calling the hotline 1800-102-1482",
+        "By emailing ethics@phonepe.com, calling the hotline 1800-102-1482, or visiting www.phonepeethics.com"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "ETHICS"
+    },
+    {
+      "allegation": "Commercial Bribery",
+      "clue": "My vendor offered to lower cost proposal in exchange for his son's employment at PhonePe. Is this acceptable?",
+      "options": [
+        "No, as it constitutes quid pro quo and creates a conflict of interest.",
+        "Yes, provided the son is qualified for the position."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "BRIBERY"
+    },
+    {
+      "allegation": "Commercial Bribery",
+      "clue": "An employee offers a gift bag to vendor in exchange for receiving a lower price for the service. Identify a violation.",
+      "options": [
+        "Financial Integrity",
+        "Commercial Bribery"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "BRIBERY"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "A situation where personal interests interfere with, or may appear to interfere with, an employee's work at PhonePe is ________",
+      "options": [
+        "Conflict of Interest",
+        "Fraud"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CONFLICT"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "Is using PhonePe resources (laptop, supplies, work time) for personal blogging a potential conflict of interest?",
+      "options": [
+        "No, till the time it does not interfere with work productivity.",
+        "Yes, this is a violation."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "CONFLICT OF INTEREST"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "I work in Financial Services, and I received a birthday gift from a friend who is also a vendor for PhonePe in the Engineering department. Can I keep the gift?",
+      "options": [
+        "Yes, you can if in your job, you have no influence over PhonePe's business relationship with this vendor.",
+        "No, as this is a conflict."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CONFLICT"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "A PhonePe-r is involved in selecting and onboarding a vendor whose owner is a family member. Is it a conflict of interest?",
+      "options": [
+        "Yes, employee must disclose any family association with a vendor.",
+        "No disclosure is required."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CONFLICT OF INTEREST"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "A PhonePe-r accepts a Diwali gift from a vendor they actively manage. Identify the violation",
+      "options": [
+        "COI - Supplier relationship",
+        "COI - Gift from Supplier"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "CONFLICT"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "Is it a policy violation to financially invest in a PhonePe vendor you work with?",
+      "options": [
+        "Yes, it's a policy violation because it creates a direct conflict of interest.",
+        "No, it's generally allowed, provided the investment is small."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CONFLICT OF INTEREST"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "A vendor you directly work with offered you movie tickets for sustaining the business relationship. Can you accept them?",
+      "options": [
+        "No, accepting the tickets could be seen as an influence on the business relationship.",
+        "Yes, accepting the tickets is fine as long as it is outside the office premises."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CONFLICT OF INTEREST"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "My manager has a romantic relationship with their direct reportee. This seems to be undisclosed but can I report this?",
+      "options": [
+        "No, it is a Conflict of Interest.",
+        "No, you should not report this as it is a private matter between them."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CONFLICT"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "I have been invited to participate in a panel discussion at my member association. Can I proceed with this engagement?",
+      "options": [
+        "Yes, as long as there is no media present.",
+        "Reach out to Ethics and Corporate Communications before accepting."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "CONFLICT OF INTEREST"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "For Conflict of interest policy, __________ means any business that offers the same or similar products or services to the same potential market or customer.",
+      "options": [
+        "Competitor",
+        "Supplier"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CONFLICT"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "Which scenario most clearly qualifies as a Conflict of Interest?",
+      "options": [
+        "Accepting gifts from a vendor with whom you have an active business relationship.",
+        "Accepting product samples from a potential vendor for evaluation purposes."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CONFLICT OF INTEREST"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "Both close friendships and family relationships can create potential conflicts of interest.",
+      "options": [
+        "True, both can lead to a conflict of interest.",
+        "False, only family relationships can qualify as a conflict of interest."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "CONFLICT OF INTEREST"
+    },
+    {
+      "allegation": "Conflict of Interest",
+      "clue": "Samples received from potential vendors to evaluate potential products can be used for personal or business use.",
+      "options": [
+        "True, samples can be used for personal/business use after evaluation.",
+        "False, all samples must be returned to vendor after evaluation."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "CONFLICT"
+    },
+    {
+      "allegation": "D&H",
+      "clue": "Identify this policy that prohibits discrimination and harassment and promotes a workplace that is free of discrimination or harassment based on protected status.",
+      "options": [
+        "Prevention of Sexual harassment at Workplace Policy",
+        "Discrimination & Harassment Prevention Policy"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "D&H",
+      "clue": "For a role, the hiring manager refused to hire qualified candidates above the age of 40. Identify the discrimination.",
+      "options": [
+        "Discrimination based on age",
+        "Discrimination based on gender"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "DISCRIMINATION"
+    },
+    {
+      "allegation": "D&H",
+      "clue": "Can a PhonePe-r who identifies as \"transexual\" raise a sexual harassment concern with Ethics?",
+      "options": [
+        "No, as current legal provisions do not support such complaints.",
+        "Yes, such a complaint is recognized as a violation of the Code of Conduct."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "D&H",
+      "clue": "A hiring manager rejects a job candidate solely because she uses a wheelchair. Identify the type of \"discrimination\".",
+      "options": [
+        "Discrimination based on gender",
+        "Discrimination based on disability"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "DISCRIMINATION"
+    },
+    {
+      "allegation": "D&H",
+      "clue": "An employee received a poor appraisal due to being on maternity leave. Identify the type of \"discrimination\".",
+      "options": [
+        "Discrimination based on gender",
+        "Discrimination based on gender identity"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "DISCRIMINATION"
+    },
+    {
+      "allegation": "D&H",
+      "clue": "A manager makes belittling comments about an employee's accent, targeting their national origin. Identify the type of \"harassment\".",
+      "options": [
+        "Discrimination & harassment based on religion",
+        "Discrimination & harassment based on race, ethnicity, and national origin"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "D&H",
+      "clue": "An employee is mocked and excluded by colleagues due to their sexual orientation. Identify the type of \"discrimination\".",
+      "options": [
+        "Discrimination based on gender",
+        "Discrimination based on gender identity"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "DISCRIMINATION"
+    },
+    {
+      "allegation": "Environment, Health & Safety",
+      "clue": "The office fire exit is blocked by cardboard cartons. Should I report this?",
+      "options": [
+        "You should ignore it as it is not your responsibility.",
+        "Yes, immediately report the blocked fire exit to your manager, facilities, or building management, as it's a serious safety hazard."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "COMPLIANCE"
+    },
+    {
+      "allegation": "Environment, Health & Safety",
+      "clue": "Small sparks are coming from the cafeteria toaster. Should I report this?",
+      "options": [
+        "Ignore it - as it is a small spark.",
+        "Reach out to Compliance as it's a safety hazard."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "COMPLIANCE"
+    },
+    {
+      "allegation": "Environment, Health & Safety",
+      "clue": "What is the primary purpose of an Environment, Health & Safety (EHS) program in the workplace?",
+      "options": [
+        "Ensure compliance with laws and regulations",
+        "Reduce operational costs"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "SAFETY"
+    },
+    {
+      "allegation": "Environment, Health & Safety",
+      "clue": "What is the primary benefit of conducting regular safety drills?",
+      "options": [
+        "To prepare employees for emergencies",
+        "To increase productivity"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "SAFETY"
+    },
+    {
+      "allegation": "Environment, Health & Safety",
+      "clue": "Which of the following is a key component of an effective waste management program?",
+      "options": [
+        "Disposing of all waste in a single bin",
+        "Practicing waste segregation"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "ENVIRONMENT"
+    },
+    {
+      "allegation": "Financial Integrity",
+      "clue": "Is it okay to \"smooth out\" our financial information so \"good months\" can help our \"bad months\"?",
+      "options": [
+        "No, as this is a violation of financial integrity and is considered fraud.",
+        "Yes, if it has a good long-term financial impact."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "FINANCIAL INTEGRITY"
+    },
+    {
+      "allegation": "Financial Integrity",
+      "clue": "Is it permissible to enter inaccurate accounting information to balance departmental financial records?",
+      "options": [
+        "No, entering inaccurate accounting information is strictly prohibited as it constitutes financial misconduct.",
+        "Yes, it's acceptable if it helps balance the books and is a minor adjustment."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "FINANCIAL INTEGRITY"
+    },
+    {
+      "allegation": "Financial Integrity",
+      "clue": "Which scenario qualifies to be a \"financial integrity\" violation?",
+      "options": [
+        "Manipulating tax balances.",
+        "Fraudulent onboarding of merchants."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "FINANCIAL INTEGRITY"
+    },
+    {
+      "allegation": "Fraud",
+      "clue": "An employee producing forged medical documents to extend the leave/work from home. Identify the violation.",
+      "options": [
+        "Conflict of Interest",
+        "Fraud"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "FRAUD"
+    },
+    {
+      "allegation": "IT Compliance",
+      "clue": "What is \"phishing\" mean in the context of IT security?",
+      "options": [
+        "A cybercrime where attackers trick individuals into revealing sensitive information, often through deceptive emails or websites.",
+        "A type of software that helps analyse network traffic for security vulnerabilities."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "IT COMPLIANCE"
+    },
+    {
+      "allegation": "IT Compliance",
+      "clue": "You receive an email requesting your password via a link for a routine security check. What is your immediate action?",
+      "options": [
+        "Check with IT to verify its authenticity before taking any action.",
+        "Click the link and enter your password, as it's a routine security check."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "IT COMPLIANCE"
+    },
+    {
+      "allegation": "IT Compliance",
+      "clue": "What is the significance of 'third-party risk management' in technology compliance?",
+      "options": [
+        "To ensure that vendors and partners also comply with relevant PhonePe's security and privacy requirements.",
+        "To completely avoid using any third-party services."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "IT COMPLIANCE"
+    },
+    {
+      "allegation": "IT Compliance",
+      "clue": "Which of these best describes a 'vulnerability' in cybersecurity?",
+      "options": [
+        "A weakness in a system that can be exploited by a threat.",
+        "A hacker trying to break into computer systems."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "IT COMPLIANCE"
+    },
+    {
+      "allegation": "IT Compliance",
+      "clue": "What is the primary purpose of a 'risk assessment' in the context of technology risk and compliance?",
+      "options": [
+        "To identify, analyse, and evaluate potential risks to PhonePe's information systems.",
+        "To implement security controls without prior analysis."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "IT COMPLIANCE"
+    },
+    {
+      "allegation": "L&E",
+      "clue": "Which organization in India is responsible for enforcing compliance with labour laws in workplaces?",
+      "options": [
+        "Ministry of Labour and Employment",
+        "Labour Welfare Board"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "COMPLIANCE"
+    },
+    {
+      "allegation": "L&E",
+      "clue": "According to the Payment of Gratuity Act, 1972, how many years of continuous service are required for an employee to be eligible for gratuity?",
+      "options": [
+        "7 years",
+        "5 years"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "LABOUR COMPLIANCE"
+    },
+    {
+      "allegation": "L&E",
+      "clue": "According to the Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013, who is responsible for ensuring a safe working environment for women?",
+      "options": [
+        "Women employees",
+        "Employer"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "COMPLIANCE"
+    },
+    {
+      "allegation": "L&E",
+      "clue": "Which legislation mandates the provision of maternity benefits to female employees in India?",
+      "options": [
+        "Maternity Benefit Act, 1961",
+        "Child Labour (Prohibition and Regulation) Act, 1986"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "COMPLIANCE"
+    },
+    {
+      "allegation": "L&E",
+      "clue": "Which legislation prohibits discrimination in employment based on gender in India?",
+      "options": [
+        "Equal Remuneration Act, 1976",
+        "Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "COMPLIANCE"
+    },
+    {
+      "allegation": "L&E",
+      "clue": "What is the primary purpose of the Employees' Provident Fund (EPF)?",
+      "options": [
+        "To provide short-term loans to employees for personal expenses.",
+        "To build a retirement collection for employees through regular salary collection."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "LABOUR COMPLIANCE"
+    },
+    {
+      "allegation": "L&P",
+      "clue": "Which primary license is mandatory for all businesses in India, including IT firms?",
+      "options": [
+        "Pollution Control Board License",
+        "Shops and Establishment License"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "LICENSE"
+    },
+    {
+      "allegation": "L&P",
+      "clue": "What is the primary purpose of \"Trademark Registration\" for an IT company?",
+      "options": [
+        "To protect the company's brand identity",
+        "To register employees"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "PERMITS"
+    },
+    {
+      "allegation": "Mishandling Business Information",
+      "clue": "An ex-colleague frequently shares competitor 'intel' with our team. Is accepting this information permissible?",
+      "options": [
+        "It's okay, as long as you keep the information vague and general.",
+        "No, any such information is confidential and should not be discussed."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "BUSINESS INFORMATION"
+    },
+    {
+      "allegation": "Mishandling Business Information",
+      "clue": "What violation occurs if a manager shares their login password with a team member to complete training?",
+      "options": [
+        "Mishandling Business Information",
+        "Conflict of Interest"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "BUSINESS INFORMATION"
+    },
+    {
+      "allegation": "Mishandling Business Information",
+      "clue": "Price, discounts, profit margins, sales volumes are examples of ____________.",
+      "options": [
+        "Personal Identifiable Information",
+        "Competitively Sensitive Information"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "COMPLIANCE"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "Select an example of a confidential data.",
+      "options": [
+        "Employee's social security number",
+        "A press release about a new product"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "PRIVACY"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "How is \"access control\" defined in a tech company?",
+      "options": [
+        "Regulating the types of devices employees use.",
+        "Managing who can view or use certain resources or information."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "PRIVACY"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "What violation occurs if a PhonePe-r discloses health information without authorization?",
+      "options": [
+        "Mishandling Business Information",
+        "Fraud"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "BUSINESS INFORMATION"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "Following are the examples of Sensitive Personal Identifiable Information.",
+      "options": [
+        "Medical records, biometric data, Financial information",
+        "Zip Code, birth date, geographical details"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "PRIVACY"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "Which of these is not a best practice when trying to protect your privacy?",
+      "options": [
+        "Writing and storing your passwords on sticky notes",
+        "Using a strong passphrase"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "PRIVACY"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "Why is it important to have a privacy policy?",
+      "options": [
+        "To increase website traffic.",
+        "To inform users how their data will be used."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "PRIVACY"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "A customer emails you requesting for their personal data stored by your company. How should you respond?",
+      "options": [
+        "Inform them that you cannot share any information due to company policy.",
+        "Verify their identity and then provide the requested information in accordance with internal policies, processes, and applicable laws."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "PRIVACY"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "Which of the following is a privacy violation?",
+      "options": [
+        "News app asking for camera access.",
+        "Banking app accessing your location for login purposes."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "PRIVACY"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "Who is responsible for ensuring data privacy at PhonePe?",
+      "options": [
+        "Compliance, HR and Legal",
+        "Every PhonePe-r"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "PRIVACY"
+    },
+    {
+      "allegation": "Privacy",
+      "clue": "When sharing any customer data, ensure maximum stakeholders are looped in for visibility to prevent future escalations.",
+      "options": [
+        "True, include maximum people for visibility to ensure broader awareness and prevent future issues.",
+        "False, only share customer data with minimum necessary individuals who have a legitimate business need."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "PRIVACY"
+    },
+    {
+      "allegation": "Retaliation",
+      "clue": "Select the action that is an example of retaliation after raising a an ethics concern.",
+      "options": [
+        "Threatening to give a negative performance review.",
+        "Checking in on a task that was due yesterday."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "RETALIATION"
+    },
+    {
+      "allegation": "Retaliation",
+      "clue": "Is ridiculing an employee who has raised a concern considered a violation of PhonePe's Code of Conduct?",
+      "options": [
+        "No, it is considered acceptable as fun and banter.",
+        "Yes, it constitutes a form of retaliation."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "RETALIATION"
+    },
+    {
+      "allegation": "Retaliation",
+      "clue": "My manager was disciplined for using offensive language at work. He informed us that they were receiving poor reviews because of this. Can I report this?",
+      "options": [
+        "No, as the management will be take care of it.",
+        "Yes, reach out and report it to Ethics as this is retaliation."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "RETALIATION"
+    },
+    {
+      "allegation": "Retaliation",
+      "clue": "I'm hesitant to report a concern about a leader due to fear of retaliation. What steps should I take?",
+      "options": [
+        "Voice your concerns to Ethics. PhonePe has zero tolerance to retaliation.",
+        "Ignore the concern, as it could be detrimental to your career."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "RETALIATION"
+    },
+    {
+      "allegation": "Retaliation",
+      "clue": "I spoke up and raised my concern about a leader. I feel my peers are holding this against me. What should I do?",
+      "options": [
+        "Remain quiet - the management will take care of it.",
+        "If you feel retaliated - report it to Ethics."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "RETALIATION"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "___________ means any place visited by the employee arising out of or during the course of employment, as per POSH Policy.",
+      "options": [
+        "Internal Committee",
+        "Workplace"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "WORKPLACE"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "Which scenario would be classified as sexual harassment in the workplace?",
+      "options": [
+        "Humiliation for not meeting work deadlines or targets.",
+        "Humiliation due to the employee's refusal of a demand for sexual favours."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "Third parties, such as visitors or contractors, are NOT covered by the POSH policy.",
+      "options": [
+        "True, the policy only applies to PhonePe-rs",
+        "False, the policy extends to third-parties such as visitors and contractors"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "POLICY"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "A senior employee demanding sexual favours from a junior employee in exchange for preferential treatment is ____________.",
+      "options": [
+        "Quid pro quo",
+        "Hostile environment"
+      ],
+      "correctIndex": 0,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "A complainant should make a complaint of Sexual Harassment at the Workplace to the IC within a period of __________ from the date of the incident.",
+      "options": [
+        "3 weeks",
+        "3 months"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "The 'Workplace,' as per the Prevention of Sexual Harassment (POSH) Policy, includes just the PhonePe's physical office premises.",
+      "options": [
+        "TRUE, only PhonePe's physical office premises are covered.",
+        "FALSE, it includes extended workplace such work from home, official offsites, etc."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "An employee constantly stares at the body parts of a female colleague, making her uncomfortable. Identify the form of sexual harassment.",
+      "options": [
+        "Physical Sexual Harassment",
+        "Visual/non-verbal Sexual Harassment"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "An employee habitually leads female colleagues by the waist when exiting the lift, causing discomfort. What type of sexual harassment is this?",
+      "options": [
+        "Verbal sexual harassment",
+        "Physical sexual harassment"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "______________ and _________________ amount to workplace harassment while ___________________ amounts to sexual harassment.",
+      "options": [
+        "Discrimination; displaying explicit sexual material; victimisation",
+        "Discrimination; victimisation; displaying explicit sexual material"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "Is there a duty to report witnessed sexual harassment?",
+      "options": [
+        "Yes, you are encouraged to report any witnessed sexual harassment to maintain a safe workplace.",
+        "No, there's no duty. You can report if you are directly targeted."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "SAFE WORKPLACE"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "PhonePe's POSH Policy does not cover remote working/work-from-home (WFH) scenarios.",
+      "options": [
+        "True, PhonePe's POSH Policy extends to remote and WFH environments.",
+        "False, the POSH Policy applies only to physical office premises."
+      ],
+      "correctIndex": 0,
+      "categoryWord": "SAFE WORKPLACE"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "At PhonePe, genders aside from female, cannot report a concern on sexual harassment.",
+      "options": [
+        "True, only female employees are permitted to report sexual harassment concerns under PhonePe's policy.",
+        "False, PhonePe's sexual harassment policy covers all genders, allowing anyone to report concerns."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "SAFE WORKPLACE"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "In POSH proceedings, the Complainant will be liable for appropriate disciplinary action if the complaint of sexual harassment is found to be __________________.",
+      "options": [
+        "Inconclusive",
+        "False and malicious"
+      ],
+      "correctIndex": 1,
+      "categoryWord": "SAFE WORKPLACE"
+    },
+    {
+      "allegation": "Sexual Harassment",
+      "clue": "During POSH proceedings before the Internal Committee, parties are permitted to bring a legal practitioner to represent them.",
+      "options": [
+        "True, parties have the right to bring a legal practitioner to represent them during POSH proceedings.",
+        "False, legal practitioners are not allowed for representation."
+      ],
+      "correctIndex": 1,
+      "categoryWord": "HARASSMENT"
     }
   ]
 }

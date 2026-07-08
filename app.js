@@ -65,12 +65,12 @@ function validateConfig(data) {
     if (q.correctIndex < 0 || q.correctIndex >= q.options.length) {
       throw new Error(`Question ${i + 1} has invalid correctIndex`);
     }
-    const word = getAnswerWord(q);
+    const word = getCategoryWord(q);
     if (!word || word.length < 2) {
-      throw new Error(`Question ${i + 1} answer is too short after normalization`);
+      throw new Error(`Question ${i + 1} categoryWord is too short after normalization`);
     }
     if (word.length > (data.grid?.maxSize ?? 24)) {
-      throw new Error(`Question ${i + 1} answer "${word}" exceeds grid maxSize`);
+      throw new Error(`Question ${i + 1} category "${word}" exceeds grid maxSize`);
     }
   });
 }
@@ -83,10 +83,16 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
-/** Puzzle target = the correct quiz answer (normalized). Optional q.answer overrides option text. */
-function getAnswerWord(q) {
+/** Puzzle target = category / keyword of the question (Game Rules #2). */
+function getCategoryWord(q) {
+  if (q.categoryWord) return normalizeAnswer(q.categoryWord);
   if (q.answer) return normalizeAnswer(q.answer);
   return normalizeAnswer(q.options[q.correctIndex]);
+}
+
+function getCategoryLabel(q) {
+  if (q.categoryWord) return String(q.categoryWord).trim();
+  return getCategoryWord(q);
 }
 
 function getAnswerLabel(q) {
@@ -97,6 +103,22 @@ function normalizeAnswer(s) {
   return String(s || "")
     .toUpperCase()
     .replace(/[^A-Z0-9]/g, "");
+}
+
+function halfPoints(full) {
+  return Math.round(full / 2);
+}
+
+/** Pick `count` random unique questions from the bank for this player. */
+function pickRoundQuestions(all, count, seed) {
+  const rng = seededRandom(seed);
+  const idxs = all.map((_, i) => i);
+  for (let i = idxs.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+  }
+  const n = Math.min(count, idxs.length);
+  return idxs.slice(0, n).map((i) => all[i]);
 }
 
 function delay(ms) {
@@ -126,14 +148,10 @@ function seededRandom(seed) {
 
 function pickDecoys(allDecoys, variant, qIndex, targetWord, question, count = 5) {
   const rng = seededRandom(variant * 97 + qIndex * 13 + 7);
-  const forbidden = new Set((cfg?.questions ?? []).map(getAnswerWord));
-  const wrongOptions = (question?.options ?? [])
-    .filter((_, i) => i !== question.correctIndex)
+  const maxLen = cfg?.grid?.maxSize ?? 22;
+  const pool = (allDecoys ?? [])
     .map(normalizeAnswer)
-    .filter((w) => w && w !== targetWord && !forbidden.has(w) && w.length <= 14);
-
-  const pool = [...wrongOptions, ...allDecoys.map(normalizeAnswer)]
-    .filter((w) => w && w !== targetWord && !forbidden.has(w));
+    .filter((w) => w && w !== targetWord && w.length >= 2 && w.length <= maxLen);
   const unique = [...new Set(pool)];
   const shuffled = unique.sort(() => rng() - 0.5);
   return shuffled.slice(0, count);
@@ -272,6 +290,7 @@ let state = {
   screen: Screen.START,
   questionIndex: 0,
   puzzleVariant: 0,
+  roundQuestions: [],
   totalScore: 0,
   roundScores: [],
   currentRound: null,
@@ -286,6 +305,14 @@ let state = {
   selEnd: null,
   locked: false,
 };
+
+function activeQuestion() {
+  return state.roundQuestions[state.questionIndex];
+}
+
+function roundsPerGame() {
+  return Math.min(cfg.roundsPerGame ?? 3, cfg.questions.length);
+}
 
 function clearGridHandlers() {
   if (gridAbort) {
@@ -314,8 +341,13 @@ function nowMs() {
 function startGame() {
   clearTimers();
   const variantCount = cfg.puzzleVariants ?? 10;
-  state.questionIndex = 0;
   state.puzzleVariant = getNextVariantIndex(variantCount);
+  state.roundQuestions = pickRoundQuestions(
+    cfg.questions,
+    roundsPerGame(),
+    state.puzzleVariant * 7919 + Date.now(),
+  );
+  state.questionIndex = 0;
   state.totalScore = 0;
   state.roundScores = [];
   state.currentRound = null;
@@ -327,8 +359,8 @@ function startGame() {
 }
 
 function startWordFind() {
-  const q = cfg.questions[state.questionIndex];
-  const target = getAnswerWord(q);
+  const q = activeQuestion();
+  const target = getCategoryWord(q);
   const decoys = pickDecoys(
     cfg.decoyWords ?? [],
     state.puzzleVariant,
@@ -378,7 +410,7 @@ async function answerQuiz(optionIndex) {
   if (state.locked || state.screen !== Screen.QUIZ) return;
   state.locked = true;
 
-  const q = cfg.questions[state.questionIndex];
+  const q = activeQuestion();
   const correct = optionIndex === q.correctIndex;
   const quizPts = correct ? (cfg.quizPoints ?? 10) : 0;
 
@@ -395,7 +427,7 @@ async function answerQuiz(optionIndex) {
   }
 
   beep("good");
-  state.feedback = { type: "good", text: `Correct! +${quizPts} points` };
+  state.feedback = { type: "good", text: `Correct! +${quizPts} points — find the category` };
   render();
   await delay(1100);
   if (state.screen !== Screen.QUIZ) return;
@@ -421,12 +453,14 @@ async function onWordSelected(matchIdx) {
   state.locked = true;
 
   const full = cfg.wordPoints ?? 10;
+  const quizPts = state.currentRound.quiz ?? 0;
 
   if (matchIdx === 0) {
+    // Correct category keyword → full word points
     clearTimers();
     beep("good");
     state.currentRound.word = full;
-    state.feedback = { type: "good", text: `Word found! +${full} points` };
+    state.feedback = { type: "good", text: `Category found! +${full} points` };
     render();
     await delay(1300);
     if (state.screen !== Screen.WORDFIND) return;
@@ -435,12 +469,29 @@ async function onWordSelected(matchIdx) {
     return;
   }
 
-  // Wrong word — no points, stay on puzzle and let player retry
+  if (matchIdx > 0) {
+    // Rule #5: correct quiz + incorrect category → only half the points (of the round total)
+    clearTimers();
+    beep("bad");
+    const halfTotal = halfPoints(quizPts + full);
+    state.currentRound.word = Math.max(0, halfTotal - quizPts);
+    state.feedback = {
+      type: "warn",
+      text: `Wrong category — half points only (+${halfTotal} total)`,
+    };
+    render();
+    await delay(1400);
+    if (state.screen !== Screen.WORDFIND) return;
+    state.feedback = null;
+    finishRound();
+    return;
+  }
+
   beep("bad");
   state.selecting = false;
   state.selStart = null;
   state.selEnd = null;
-  state.feedback = { type: "bad", text: "Wrong word — try again" };
+  state.feedback = { type: "bad", text: "Not a valid word — try again" };
   render();
   await delay(900);
   if (state.screen !== Screen.WORDFIND) return;
@@ -463,7 +514,7 @@ function finishRound() {
   clearGridHandlers();
   state.questionIndex++;
 
-  if (state.questionIndex >= cfg.questions.length) {
+  if (state.questionIndex >= state.roundQuestions.length) {
     endGame();
   } else {
     state.screen = Screen.QUIZ;
@@ -483,6 +534,7 @@ function goStart() {
   clearGridHandlers();
   state.screen = Screen.START;
   state.questionIndex = 0;
+  state.roundQuestions = [];
   state.totalScore = 0;
   state.roundScores = [];
   state.currentRound = null;
@@ -624,15 +676,16 @@ function renderStart() {
   const wordSec = cfg.wordFindSeconds ?? 15;
   const quizPts = cfg.quizPoints ?? 10;
   const wordPts = cfg.wordPoints ?? 10;
-  const roundCount = cfg.questions.length;
+  const roundCount = roundsPerGame();
+  const bankSize = cfg.questions.length;
   $app.innerHTML = `
     <div class="screen">
-      ${renderHeader("PhonePe", "Quiz + Find the Word", `<span class="chip">${cfg.kioskResolution ?? "1920×1080"}</span>`)}
+      ${renderHeader("PhonePe Integrity", "Quiz + Find the Word", `<span class="chip">${cfg.kioskResolution ?? "1920×1080"}</span>`)}
       <div class="start-hero">
-        <h1>Quiz & <span>Find the Word</span></h1>
+        <h1>Integrity <span>Challenge</span></h1>
         <p class="lead">
-          Answer <strong>${roundCount} questions</strong>, then find the <strong>same answer</strong> hidden in the puzzle grid.
-          Correct quiz answers earn points. Find the right answer for full word points — wrong selection gives 0.
+          Answer <strong>${roundCount} questions</strong> from the Ethics bank (${bankSize} total).
+          If correct, find the question’s <strong>category</strong> in the word grid within ${wordSec}s.
         </p>
         <div class="steps">
           <div class="step">
@@ -642,19 +695,19 @@ function renderStart() {
           </div>
           <div class="step">
             <div class="step-num">2</div>
-            <div class="step-title">Find the answer</div>
-            <div class="step-desc">${wordSec}s to find your answer in the grid · +${wordPts} pts</div>
+            <div class="step-title">Find the category</div>
+            <div class="step-desc">${wordSec}s to find the keyword · +${wordPts} pts</div>
           </div>
           <div class="step">
             <div class="step-num">3</div>
-            <div class="step-title">${roundCount} rounds total</div>
-            <div class="step-desc">Wrong word = 0 pts · Try again until time runs out</div>
+            <div class="step-title">${roundCount} rounds · ~1 min</div>
+            <div class="step-desc">Wrong category = half points · Wrong quiz = skip puzzle</div>
           </div>
         </div>
         <button class="btn btn-primary" data-start>Tap to Start</button>
       </div>
       <footer class="footer">
-        <span>Touch-only kiosk game</span>
+        <span>Touch-only Integrity campaign game</span>
         <span>10 puzzle variants · no repeat for consecutive players</span>
       </footer>
     </div>
@@ -668,8 +721,8 @@ function renderStart() {
 }
 
 function renderQuiz() {
-  const q = cfg.questions[state.questionIndex];
-  const total = cfg.questions.length;
+  const q = activeQuestion();
+  const total = state.roundQuestions.length;
   const opts = q.options
     .map(
       (opt, i) => `
@@ -689,7 +742,7 @@ function renderQuiz() {
       )}
       <div class="screen-body quiz-body">
         <div class="card card-sm quiz-card">
-          <div class="section-label">Question ${state.questionIndex + 1}</div>
+          <div class="section-label">${escapeHtml(q.allegation || "Integrity")} · Round ${state.questionIndex + 1}</div>
           <h2 class="quiz-question">${escapeHtml(q.clue)}</h2>
           <p class="quiz-hint">Tap the correct answer below</p>
           <div class="quiz-options">${opts}</div>
@@ -709,16 +762,18 @@ function renderQuiz() {
 }
 
 function renderWordFind() {
-  const q = cfg.questions[state.questionIndex];
+  const q = activeQuestion();
+  const categoryLabel = getCategoryLabel(q);
+  const categoryWord = getCategoryWord(q);
   const answerLabel = getAnswerLabel(q);
-  const answerWord = getAnswerWord(q);
   const totalMs = (cfg.wordFindSeconds ?? 15) * 1000;
+  const half = halfPoints((cfg.quizPoints ?? 10) + (cfg.wordPoints ?? 10));
   const gridHtml = buildGridHtml(state.gridData, true);
 
   $app.innerHTML = `
     <div class="screen">
       ${renderHeader(
-        "Find the Answer",
+        "Find the Word",
         `Round ${state.questionIndex + 1} · Puzzle #${state.puzzleVariant + 1}`,
         `<span class="chip chip-strong">Score: ${displayScore()}</span>`,
       )}
@@ -727,9 +782,9 @@ function renderWordFind() {
           <div class="card card-sm puzzle-card">
             <div data-timer-host>${renderTimerBlock(state.remainingMs, totalMs)}</div>
             <div class="find-target">
-              <span class="find-target-label">Find this answer in the grid</span>
-              <strong>${escapeHtml(answerLabel)}</strong>
-              <span class="find-target-code">${escapeHtml(answerWord)}</span>
+              <span class="find-target-label">Find this category in the grid</span>
+              <strong>${escapeHtml(categoryLabel)}</strong>
+              <span class="find-target-code">${escapeHtml(categoryWord)}</span>
             </div>
             <div class="grid-section">
               ${gridHtml}
@@ -739,16 +794,17 @@ function renderWordFind() {
           <div class="card card-sm rules-card">
             <div class="section-label">Rules</div>
             <ul class="rules-list">
-              <li>Find the <strong>correct answer</strong> from the quiz in the grid</li>
-              <li>Wrong options and similar words are hidden as decoys</li>
-              <li>Correct answer → <strong>+${cfg.wordPoints ?? 10} pts</strong></li>
-              <li>Wrong selection → <strong>0 pts</strong> — keep trying</li>
-              <li>Time runs out → move to next question</li>
+              <li>Find the question’s <strong>category keyword</strong> in the grid</li>
+              <li>Similar integrity words are hidden as decoys</li>
+              <li>Correct category → <strong>+${cfg.wordPoints ?? 10} pts</strong></li>
+              <li>Wrong category → <strong>half points only</strong> (~${half} total)</li>
+              <li>Time runs out → no word points</li>
             </ul>
             <div class="quiz-recap">
               <div class="section-label">You answered</div>
               <p class="recap-q">${escapeHtml(q.clue)}</p>
               <p class="recap-a">✓ ${escapeHtml(answerLabel)}</p>
+              <p class="recap-cat">Category: <strong>${escapeHtml(categoryLabel)}</strong></p>
             </div>
           </div>
         </div>
@@ -768,18 +824,18 @@ function renderEnd() {
     const quizMax = cfg.quizPoints ?? 10;
     const wordMax = r.quizCorrect ? (cfg.wordPoints ?? 10) : 0;
     return sum + quizMax + wordMax;
-  }, 0) || cfg.questions.length * ((cfg.quizPoints ?? 10) + (cfg.wordPoints ?? 10));
+  }, 0) || roundsPerGame() * ((cfg.quizPoints ?? 10) + (cfg.wordPoints ?? 10));
   const left = cfg.idleResetSeconds ?? 10;
 
   const rows = state.roundScores
     .map((r, i) => {
-      const q = cfg.questions[i];
+      const q = state.roundQuestions[i];
       return `
         <div class="score-row">
-          <div class="score-q">Q${i + 1}: ${escapeHtml(q.clue)}</div>
+          <div class="score-q">Q${i + 1}: ${escapeHtml(q.allegation || q.clue)}</div>
           <div class="score-detail">
             Quiz: ${r.quizCorrect ? `+${r.quiz}` : "0"}
-            ${r.quizCorrect ? ` · Answer: +${r.word}` : " (skipped)"}
+            ${r.quizCorrect ? ` · Category: +${r.word}` : " (skipped)"}
             · <strong>${r.total} pts</strong>
           </div>
         </div>`;

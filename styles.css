@@ -796,9 +796,9 @@ button {
 
 .quiz-question {
   margin: 0 0 var(--space-sm);
-  font-size: clamp(22px, 3vw, 30px);
+  font-size: clamp(18px, 2.6vw, 26px);
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.3;
   letter-spacing: -0.02em;
 }
 
@@ -815,7 +815,7 @@ button {
 
 .quiz-option {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: clamp(10px, 2.5vw, 16px);
   min-height: clamp(56px, 14vw, 68px);
   padding: clamp(12px, 3vw, 16px) clamp(14px, 3.5vw, 24px);
@@ -823,7 +823,7 @@ button {
   border-radius: var(--pp-radius);
   background: var(--pp-white);
   text-align: left;
-  font-size: clamp(14px, 3.5vw, 16px);
+  font-size: clamp(13px, 3.2vw, 16px);
   font-weight: 600;
   color: var(--pp-text);
   box-shadow: 0 1px 4px rgba(28, 28, 40, 0.07);
@@ -850,6 +850,11 @@ button {
 }
 
 .opt-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+  white-space: normal;
+}
   flex: 1;
   line-height: 1.3;
 }
@@ -925,10 +930,16 @@ button {
 }
 
 .recap-a {
-  margin: 0;
+  margin: 0 0 4px;
   font-size: 13px;
   color: var(--pp-good);
   font-weight: 600;
+}
+
+.recap-cat {
+  margin: 0;
+  font-size: 13px;
+  color: var(--pp-purple);
 }
 
 /* ── Feedback overlay ── */
