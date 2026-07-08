@@ -1,7 +1,8 @@
 {
   "orientation": "landscape",
   "kioskResolution": "1920x1080",
-  "roundsPerGame": 3,
+  "roundsPerGame": 10,
+  "genericOption": "None of the above / Not sure",
   "wordFindSeconds": 15,
   "idleResetSeconds": 10,
   "quizPoints": 10,
@@ -40,8 +41,8 @@
     "WORKPLACE"
   ],
   "grid": {
-    "minSize": 12,
-    "maxSize": 22
+    "minSize": 16,
+    "maxSize": 24
   },
   "questions": [
     {

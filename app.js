@@ -109,16 +109,44 @@ function halfPoints(full) {
   return Math.round(full / 2);
 }
 
+/** Excel A/B plus one generic wrong option (never correct). */
+function getQuizOptions(q) {
+  const a = q.options?.[0] ?? "";
+  const b = q.options?.[1] ?? "";
+  const generic = cfg?.genericOption ?? "None of the above / Not sure";
+  return [a, b, generic];
+}
+
+function shuffleInPlace(arr, rng) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 /** Pick `count` random unique questions from the bank for this player. */
 function pickRoundQuestions(all, count, seed) {
   const rng = seededRandom(seed);
   const idxs = all.map((_, i) => i);
-  for (let i = idxs.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
-  }
+  shuffleInPlace(idxs, rng);
   const n = Math.min(count, idxs.length);
   return idxs.slice(0, n).map((i) => all[i]);
+}
+
+/** All keywords for this player's 10 questions — target first, others jumbled. */
+function buildKeywordListForPuzzle(questions, targetWord, seed) {
+  const seen = new Set();
+  const unique = [];
+  for (const q of questions) {
+    const w = getCategoryWord(q);
+    if (!w || seen.has(w)) continue;
+    seen.add(w);
+    unique.push(w);
+  }
+  const others = unique.filter((w) => w !== targetWord);
+  shuffleInPlace(others, seededRandom(seed));
+  return targetWord ? [targetWord, ...others] : others;
 }
 
 function delay(ms) {
@@ -144,17 +172,6 @@ function seededRandom(seed) {
     s = (s * 1664525 + 1013904223) >>> 0;
     return s / 0xffffffff;
   };
-}
-
-function pickDecoys(allDecoys, variant, qIndex, targetWord, question, count = 5) {
-  const rng = seededRandom(variant * 97 + qIndex * 13 + 7);
-  const maxLen = cfg?.grid?.maxSize ?? 22;
-  const pool = (allDecoys ?? [])
-    .map(normalizeAnswer)
-    .filter((w) => w && w !== targetWord && w.length >= 2 && w.length <= maxLen);
-  const unique = [...new Set(pool)];
-  const shuffled = unique.sort(() => rng() - 0.5);
-  return shuffled.slice(0, count);
 }
 
 // ---- Audio ----
@@ -200,7 +217,9 @@ function randomLetter(rng = Math.random) {
 
 function computeGridSize(words, minSize, maxSize) {
   const longest = Math.max(...words.map((a) => a.length));
-  const base = Math.max(minSize, longest + 2);
+  // Grow with word count so ~10 keywords still fit (H/V only).
+  const byCount = Math.ceil(Math.sqrt(words.reduce((s, w) => s + w.length, 0) * 1.6));
+  const base = Math.max(minSize, longest + 2, byCount);
   return Math.min(maxSize, Math.max(base, minSize));
 }
 
@@ -238,37 +257,54 @@ function tryPlaceWord(grid, word, wordIndex, rng) {
 }
 
 function generateWordSearch(words, cfgGrid, seed) {
-  const normalized = words.map(normalizeAnswer);
-  const size = computeGridSize(normalized, cfgGrid.minSize ?? 12, cfgGrid.maxSize ?? 16);
+  const normalized = words.map(normalizeAnswer).filter(Boolean);
+  const minSize = cfgGrid.minSize ?? 14;
+  const maxSize = cfgGrid.maxSize ?? 24;
+  let size = computeGridSize(normalized, minSize, maxSize);
   const rng = seededRandom(seed);
 
-  for (let attempt = 0; attempt < 40; attempt++) {
-    const grid = Array.from({ length: size }, () =>
-      Array.from({ length: size }, () => ({ letter: "", belongsTo: new Set() })),
-    );
-    const placements = [];
-    let ok = true;
+  for (let grow = 0; grow < 6; grow++) {
+    const trySize = Math.min(maxSize, size + grow);
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const grid = Array.from({ length: trySize }, () =>
+        Array.from({ length: trySize }, () => ({ letter: "", belongsTo: new Set() })),
+      );
+      const placements = [];
+      let ok = true;
 
-    for (let w = 0; w < normalized.length; w++) {
-      let placed = null;
-      for (let tries = 0; tries < 300; tries++) {
-        placed = tryPlaceWord(grid, normalized[w], w, rng);
-        if (placed) break;
-      }
-      if (!placed) {
-        ok = false;
-        break;
-      }
-      placements.push(placed);
-    }
-    if (!ok) continue;
+      // Longer words first — easier packing
+      const order = normalized
+        .map((w, i) => ({ w, i }))
+        .sort((a, b) => b.w.length - a.w.length);
 
-    for (let r = 0; r < size; r++) {
-      for (let c = 0; c < size; c++) {
-        if (!grid[r][c].letter) grid[r][c].letter = randomLetter(rng);
+      const placedByOrig = new Array(normalized.length);
+      for (const { w, i } of order) {
+        let placed = null;
+        for (let tries = 0; tries < 400; tries++) {
+          placed = tryPlaceWord(grid, w, i, rng);
+          if (placed) break;
+        }
+        if (!placed) {
+          ok = false;
+          break;
+        }
+        placedByOrig[i] = placed;
       }
+      if (!ok) continue;
+
+      for (let r = 0; r < trySize; r++) {
+        for (let c = 0; c < trySize; c++) {
+          if (!grid[r][c].letter) grid[r][c].letter = randomLetter(rng);
+        }
+      }
+      return {
+        size: trySize,
+        grid,
+        words: normalized,
+        placements: placedByOrig,
+        targetIndex: 0,
+      };
     }
-    return { size, grid, words: normalized, placements, targetIndex: 0 };
   }
   throw new Error("Failed to generate grid");
 }
@@ -358,18 +394,16 @@ function startGame() {
 function startWordFind() {
   const q = activeQuestion();
   const target = getCategoryWord(q);
-  const decoys = pickDecoys(
-    cfg.decoyWords ?? [],
-    state.puzzleVariant,
-    state.questionIndex,
+  const keywords = buildKeywordListForPuzzle(
+    state.roundQuestions,
     target,
-    q,
+    state.puzzleVariant * 1000 + state.questionIndex * 37 + 11,
   );
 
   state.locked = true;
   try {
     const seed = state.puzzleVariant * 1000 + state.questionIndex * 37 + 11;
-    state.gridData = generateWordSearch([target, ...decoys], cfg.grid ?? {}, seed);
+    state.gridData = generateWordSearch(keywords, cfg.grid ?? {}, seed);
   } catch {
     state.feedback = { type: "bad", text: "Puzzle error — skipping to next question" };
     state.currentRound.word = 0;
@@ -683,30 +717,32 @@ function renderStart() {
         <h1>Integrity <span>Challenge</span></h1>
         <p class="lead">
           Answer <strong>${roundCount} questions</strong> from the Ethics bank (${bankSize} total).
-          If correct, find the question’s <strong>category</strong> in the word grid within ${wordSec}s.
+          Each quiz shows <strong>2 real options + 1 generic option</strong>.
+          If correct, find that question’s <strong>keyword</strong> in a crossword that hides
+          <strong>all ${roundCount} keywords</strong> (layout jumbled per player).
         </p>
         <div class="steps">
           <div class="step">
             <div class="step-num">1</div>
             <div class="step-title">Answer the quiz</div>
-            <div class="step-desc">Tap the correct option · +${quizPts} pts if right</div>
+            <div class="step-desc">Pick A, B, or C · +${quizPts} pts if right</div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
-            <div class="step-title">Find the category</div>
-            <div class="step-desc">${wordSec}s to find the keyword · +${wordPts} pts</div>
+            <div class="step-title">Find the keyword</div>
+            <div class="step-desc">${wordSec}s · H/V only · +${wordPts} pts</div>
           </div>
           <div class="step">
             <div class="step-num">3</div>
-            <div class="step-title">${roundCount} rounds · ~1 min</div>
-            <div class="step-desc">Wrong category = half points · Wrong quiz = skip puzzle</div>
+            <div class="step-title">${roundCount} rounds</div>
+            <div class="step-desc">Wrong keyword = half points · Wrong quiz = skip puzzle</div>
           </div>
         </div>
         <button class="btn btn-primary" data-start>Tap to Start</button>
       </div>
       <footer class="footer">
         <span>Touch-only Integrity campaign game</span>
-        <span>10 puzzle variants · no repeat for consecutive players</span>
+        <span>10 puzzle variants · keywords jumbled per player</span>
       </footer>
     </div>
   `;
@@ -721,7 +757,7 @@ function renderStart() {
 function renderQuiz() {
   const q = activeQuestion();
   const total = state.roundQuestions.length;
-  const opts = q.options
+  const opts = getQuizOptions(q)
     .map(
       (opt, i) => `
       <button class="quiz-option" data-opt="${i}" type="button">
@@ -742,13 +778,13 @@ function renderQuiz() {
         <div class="card card-sm quiz-card">
           <div class="section-label">${escapeHtml(q.allegation || "Integrity")} · Round ${state.questionIndex + 1}</div>
           <h2 class="quiz-question">${escapeHtml(q.clue)}</h2>
-          <p class="quiz-hint">Tap the correct answer below</p>
+          <p class="quiz-hint">Tap the correct answer (A / B from question bank, or C)</p>
           <div class="quiz-options">${opts}</div>
         </div>
       </div>
       <footer class="footer">
         <span>Wrong answer moves to next question</span>
-        <span>Correct answer unlocks Find the Word</span>
+        <span>Correct answer unlocks Find the Keyword</span>
       </footer>
       ${renderFeedback()}
     </div>
@@ -766,12 +802,13 @@ function renderWordFind() {
   const answerLabel = getAnswerLabel(q);
   const totalMs = (cfg.wordFindSeconds ?? 15) * 1000;
   const half = halfPoints((cfg.quizPoints ?? 10) + (cfg.wordPoints ?? 10));
+  const keywordCount = state.gridData?.words?.length ?? state.roundQuestions.length;
   const gridHtml = buildGridHtml(state.gridData, true);
 
   $app.innerHTML = `
     <div class="screen">
       ${renderHeader(
-        "Find the Word",
+        "Find the Keyword",
         `Round ${state.questionIndex + 1} · Puzzle #${state.puzzleVariant + 1}`,
         `<span class="chip chip-strong">Score: ${displayScore()}</span>`,
       )}
@@ -780,29 +817,29 @@ function renderWordFind() {
           <div class="card card-sm puzzle-card">
             <div data-timer-host>${renderTimerBlock(state.remainingMs, totalMs)}</div>
             <div class="find-target">
-              <span class="find-target-label">Find this category in the grid</span>
+              <span class="find-target-label">Find this keyword in the grid</span>
               <strong>${escapeHtml(categoryLabel)}</strong>
               <span class="find-target-code">${escapeHtml(categoryWord)}</span>
             </div>
             <div class="grid-section">
               ${gridHtml}
             </div>
-            <p class="grid-hint">Drag across letters horizontally or vertically · Release to submit</p>
+            <p class="grid-hint">Drag horizontally or vertically · ${keywordCount} keywords hidden (jumbled)</p>
           </div>
           <div class="card card-sm rules-card">
             <div class="section-label">Rules</div>
             <ul class="rules-list">
-              <li>Find the question’s <strong>category keyword</strong> in the grid</li>
-              <li>Similar integrity words are hidden as decoys</li>
-              <li>Correct category → <strong>+${cfg.wordPoints ?? 10} pts</strong></li>
-              <li>Wrong category → <strong>half points only</strong> (~${half} total)</li>
+              <li>Find this question’s <strong>keyword</strong> (not the quiz option text)</li>
+              <li>All <strong>${keywordCount} keywords</strong> from this game are in the crossword</li>
+              <li>Correct keyword → <strong>+${cfg.wordPoints ?? 10} pts</strong></li>
+              <li>Wrong keyword → <strong>half points only</strong> (~${half} total)</li>
               <li>Time runs out → no word points</li>
             </ul>
             <div class="quiz-recap">
               <div class="section-label">You answered</div>
               <p class="recap-q">${escapeHtml(q.clue)}</p>
               <p class="recap-a">✓ ${escapeHtml(answerLabel)}</p>
-              <p class="recap-cat">Category: <strong>${escapeHtml(categoryLabel)}</strong></p>
+              <p class="recap-cat">Keyword: <strong>${escapeHtml(categoryLabel)}</strong></p>
             </div>
           </div>
         </div>

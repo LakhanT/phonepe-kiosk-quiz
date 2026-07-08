@@ -1,5 +1,5 @@
 /* Offline-first kiosk cache */
-const CACHE = "phonepe-kiosk-v16";
+const CACHE = "phonepe-kiosk-v17";
 const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./questions.json", "./manifest.json"];
 
 self.addEventListener("install", (event) => {
