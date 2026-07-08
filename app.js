@@ -179,15 +179,12 @@ function beep(type) {
 }
 
 // ---- Word search generator ----
+// Game Rules: crossword is horizontal + vertical only (no diagonals).
 const DIRS = [
   { dr: 0, dc: 1 },
   { dr: 0, dc: -1 },
   { dr: 1, dc: 0 },
   { dr: -1, dc: 0 },
-  { dr: 1, dc: 1 },
-  { dr: 1, dc: -1 },
-  { dr: -1, dc: 1 },
-  { dr: -1, dc: -1 },
 ];
 
 function randInt(n, rng = Math.random) {
@@ -558,7 +555,8 @@ function cellsOnLine(a, b) {
   const sdc = sign(dc);
   const absR = Math.abs(dr);
   const absC = Math.abs(dc);
-  if (!(absR === 0 || absC === 0 || absR === absC)) return [];
+  // Horizontal or vertical only — no diagonals
+  if (!(absR === 0 || absC === 0)) return [];
   const steps = Math.max(absR, absC);
   const out = [];
   for (let i = 0; i <= steps; i++) out.push({ r: a.r + sdr * i, c: a.c + sdc * i });
@@ -789,7 +787,7 @@ function renderWordFind() {
             <div class="grid-section">
               ${gridHtml}
             </div>
-            <p class="grid-hint">Drag across letters in a straight line · Release to submit</p>
+            <p class="grid-hint">Drag across letters horizontally or vertically · Release to submit</p>
           </div>
           <div class="card card-sm rules-card">
             <div class="section-label">Rules</div>
@@ -811,7 +809,7 @@ function renderWordFind() {
       </div>
       <footer class="footer">
         <span>${cfg.wordFindSeconds ?? 15} seconds per word search</span>
-        <span>8 directions · forwards or backwards</span>
+        <span>Horizontal & vertical only · forwards or backwards</span>
       </footer>
       ${renderFeedback()}
     </div>

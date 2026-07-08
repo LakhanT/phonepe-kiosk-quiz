@@ -9,7 +9,7 @@ Touch-screen Integrity campaign game built from client **Game Rules**, **Final Q
 4. **Wrong quiz** → skip puzzle, move to next question.
 5. **Correct quiz + wrong category** → **half points** only for that round.
 6. Repeats for **3 rounds**.
-7. **15 seconds** to find the word.
+7. **15 seconds** to find the word (horizontal & vertical only — no diagonals).
 8. Similar integrity keywords are placed as decoys.
 9. Keywords come from the client question bank.
 10. **10 puzzle variants** rotate so consecutive players get different grids.
