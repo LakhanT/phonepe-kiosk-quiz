@@ -349,7 +349,7 @@ button {
 }
 
 .btn-secondary:active {
-  background: var(--pp-bg);
+  background: var(--pp-purple-soft);
 }
 
 /* ── Footer ── */
@@ -1062,19 +1062,27 @@ button {
 
 .score-row {
   padding: var(--space-md);
-  border: 2px solid var(--pp-border);
+  border: 2px solid var(--pp-border-strong);
   border-radius: var(--pp-radius-sm);
-  background: var(--pp-bg);
+  background: #fff;
 }
 
 .score-q {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 4px;
+  color: var(--pp-text);
+  line-height: 1.35;
 }
 
 .score-detail {
   font-size: 13px;
   color: var(--pp-text-secondary);
+  line-height: 1.4;
+}
+
+.score-detail strong {
+  color: var(--pp-purple-dark);
+  font-weight: 700;
 }
 
