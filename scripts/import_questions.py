@@ -9,6 +9,30 @@ XLSX = Path(r"c:\Users\spark\Downloads\Final Questions - (Digital Game).xlsx")
 OUT = Path(__file__).resolve().parents[1] / "questions.json"
 NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 
+# Plausible wrong answers per topic when no cross-question distractor is available.
+TOPIC_FALLBACK_C = {
+    "Alcohol and Drug": "One drink is fine if the team agrees informally.",
+    "AML / Sanctions": "Process the transaction if the amount looks small.",
+    "Antitrust": "Share pricing details privately with the competitor to stay competitive.",
+    "Bribery": "Approve the payment to avoid delaying the project.",
+    "Commercial Bribery": "Accept the offer if the business benefit is significant.",
+    "Conflict of Interest": "No need to disclose if the relationship is personal.",
+    "Code of Conduct": "Report only if you are directly affected.",
+    "CoC": "Report only if you are directly affected.",
+    "COC": "Report only if you are directly affected.",
+    "D&H": "Treat everyone the same without checking policy requirements.",
+    "Environment, Health & Safety": "Skip the safety step if it saves time.",
+    "Financial Integrity": "Adjust entries now and correct them in the next cycle.",
+    "Fraud": "Ignore suspicious activity unless you have full proof.",
+    "IT Compliance": "Use personal software if it works faster.",
+    "L&E": "Handle the issue informally without involving HR.",
+    "L&P": "Proceed without the license if the client is waiting.",
+    "Mishandling Business Information": "Forward the file to colleagues for quicker help.",
+    "Privacy": "Share customer details with anyone who asks politely.",
+    "Retaliation": "Stay quiet to avoid conflict with the team.",
+    "Sexual Harassment": "Wait until the behavior becomes more serious.",
+}
+
 
 def col_row(ref: str):
     m = re.match(r"([A-Z]+)(\d+)", ref)
@@ -63,6 +87,42 @@ def load_sheet():
     return rows
 
 
+def pick_option_c(question, all_questions, index):
+    """Question-specific third wrong option from the same topic only."""
+    used = set(question["options"])
+    alleg = question.get("allegation", "")
+    candidates = []
+
+    for other in all_questions:
+        if other is question:
+            continue
+        if other.get("allegation") != alleg:
+            continue
+        wrong = other["options"][1 - other["correctIndex"]]
+        if wrong not in used:
+            candidates.append(wrong)
+
+    seen = set()
+    unique = []
+    for c in candidates:
+        if c not in seen:
+            seen.add(c)
+            unique.append(c)
+
+    if unique:
+        return unique[index % len(unique)]
+
+    return TOPIC_FALLBACK_C.get(
+        alleg,
+        "Proceed without escalating since the issue seems minor.",
+    )
+
+
+def attach_third_options(questions):
+    for i, q in enumerate(questions):
+        q["optionC"] = pick_option_c(q, questions, i)
+
+
 def main():
     rows = load_sheet()
     questions = []
@@ -96,6 +156,8 @@ def main():
         )
         keyword_labels.add(kw_label)
 
+    attach_third_options(questions)
+
     decoys = sorted({re.sub(r"[^A-Z0-9]", "", k) for k in keyword_labels})
     longest = max(len(d) for d in decoys)
 
@@ -103,7 +165,6 @@ def main():
         "orientation": "landscape",
         "kioskResolution": "1920x1080",
         "roundsPerGame": 10,
-        "genericOption": "None of the above / Not sure",
         "wordFindSeconds": 15,
         "idleResetSeconds": 10,
         "quizPoints": 10,
@@ -115,7 +176,7 @@ def main():
     }
     OUT.write_text(json.dumps(cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {len(questions)} questions, {len(decoys)} decoys, maxSize={cfg['grid']['maxSize']}")
-    print("sample:", questions[0]["categoryWord"], "|", questions[13]["categoryWord"])
+    print("sample optionC:", questions[0]["optionC"][:60])
 
 
 if __name__ == "__main__":

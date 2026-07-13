@@ -109,12 +109,12 @@ function halfPoints(full) {
   return Math.round(full / 2);
 }
 
-/** Excel A/B plus one generic wrong option (never correct). */
+/** Excel A/B plus question-specific third wrong option (optionC). */
 function getQuizOptions(q) {
   const a = q.options?.[0] ?? "";
   const b = q.options?.[1] ?? "";
-  const generic = cfg?.genericOption ?? "None of the above / Not sure";
-  return [a, b, generic];
+  const c = q.optionC ?? q.options?.[2] ?? "Proceed without checking the policy.";
+  return [a, b, c];
 }
 
 function shuffleInPlace(arr, rng) {
@@ -672,7 +672,7 @@ function renderHeader(title, subtitle, chips = "") {
   return `
     <header class="header">
       <div class="brand">
-        <div class="logo" aria-hidden="true"><div class="logo-mark"></div></div>
+        <img class="logo-img" src="./assets/logo.png" alt="PhonePe" width="132" height="36" />
         <div class="title">
           <div class="h1">${title}</div>
           <div class="sub">${subtitle}</div>
@@ -766,7 +766,7 @@ function renderStart() {
         <h1>Integrity <span>Challenge</span></h1>
         <p class="lead">
           Answer <strong>${roundCount} questions</strong> from the Ethics bank (${bankSize} total).
-          Each quiz shows <strong>2 real options + 1 generic option</strong>.
+          Each quiz shows <strong>3 options</strong> (A, B, and a related third choice).
           If correct, find that question’s <strong>keyword</strong> in a crossword that hides
           <strong>all ${roundCount} keywords</strong> (layout jumbled per player).
         </p>
@@ -839,7 +839,7 @@ function renderQuiz() {
               ? reveal.picked === reveal.correct
                 ? "Correct!"
                 : "Incorrect — green option is the correct answer"
-              : "Tap the correct answer (A / B from question bank, or C)"
+              : "Tap the correct answer (A, B, or C)"
           }</p>
           <div class="quiz-options">${opts}</div>
         </div>

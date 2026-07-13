@@ -1,6 +1,19 @@
 /* Offline-first kiosk cache */
-const CACHE = "phonepe-kiosk-v18";
-const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./questions.json", "./manifest.json"];
+const CACHE = "phonepe-kiosk-v19";
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./styles.css",
+  "./app.js",
+  "./questions.json",
+  "./manifest.json",
+  "./assets/bg.png",
+  "./assets/logo.png",
+  "./assets/fonts/PhonePeSans-Light.otf",
+  "./assets/fonts/PhonePeSans-Regular.otf",
+  "./assets/fonts/PhonePeSans-Medium.otf",
+  "./assets/fonts/PhonePeSans-Bold.otf",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
