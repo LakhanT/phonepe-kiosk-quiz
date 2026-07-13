@@ -165,7 +165,7 @@ def main():
         "orientation": "landscape",
         "kioskResolution": "1920x1080",
         "roundsPerGame": 10,
-        "wordFindSeconds": 15,
+        "wordFindSeconds": 20,
         "idleResetSeconds": 10,
         "quizPoints": 10,
         "wordPoints": 10,

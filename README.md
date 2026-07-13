@@ -10,7 +10,7 @@ Touch-screen Integrity campaign game built from client **Game Rules** and **Fina
 5. Words are **horizontal & vertical only** (no diagonals).
 6. **Wrong quiz** → skip puzzle, next question.
 7. **Wrong keyword** → half points for that round.
-8. **15 seconds** per keyword search.
+8. **20 seconds** per keyword search.
 
 ## Scoring
 | Action | Points |

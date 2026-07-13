@@ -358,7 +358,7 @@ let state = {
   feedback: null,
   idleResetTimer: null,
   wordFindTimer: null,
-  remainingMs: 15000,
+  remainingMs: 20000,
   wordFindStartedAt: 0,
   selecting: false,
   selStart: null,
@@ -448,7 +448,7 @@ function startWordFind() {
     return;
   }
 
-  state.remainingMs = (cfg.wordFindSeconds ?? 15) * 1000;
+  state.remainingMs = (cfg.wordFindSeconds ?? 20) * 1000;
   state.wordFindStartedAt = nowMs();
   state.screen = Screen.WORDFIND;
   state.selecting = false;
@@ -459,7 +459,7 @@ function startWordFind() {
   clearTimers();
   state.wordFindTimer = setInterval(() => {
     const elapsed = nowMs() - state.wordFindStartedAt;
-    state.remainingMs = Math.max(0, (cfg.wordFindSeconds ?? 15) * 1000 - elapsed);
+    state.remainingMs = Math.max(0, (cfg.wordFindSeconds ?? 20) * 1000 - elapsed);
     if (state.remainingMs <= 0) {
       onWordFindTimeout();
     } else {
@@ -750,7 +750,7 @@ function displayScore() {
 
 function updateWordFindTimerUI() {
   if (state.screen !== Screen.WORDFIND) return;
-  const totalMs = (cfg.wordFindSeconds ?? 15) * 1000;
+  const totalMs = (cfg.wordFindSeconds ?? 20) * 1000;
   const host = document.querySelector("[data-timer-host]");
   if (host) host.innerHTML = renderTimerBlock(state.remainingMs, totalMs);
 }
@@ -786,7 +786,7 @@ function buildGridHtml(gridData, interactive = true) {
 }
 
 function renderStart() {
-  const wordSec = cfg.wordFindSeconds ?? 15;
+  const wordSec = cfg.wordFindSeconds ?? 20;
   const quizPts = cfg.quizPoints ?? 10;
   const wordPts = cfg.wordPoints ?? 10;
   const roundCount = roundsPerGame();
@@ -897,7 +897,7 @@ function renderWordFind() {
   const categoryLabel = getCategoryLabel(q);
   const categoryWord = getCategoryWord(q);
   const answerLabel = getAnswerLabel(q);
-  const totalMs = (cfg.wordFindSeconds ?? 15) * 1000;
+  const totalMs = (cfg.wordFindSeconds ?? 20) * 1000;
   const half = halfPoints((cfg.quizPoints ?? 10) + (cfg.wordPoints ?? 10));
   const keywordCount = state.gridData?.words?.length ?? state.roundQuestions.length;
   const gridHtml = buildGridHtml(state.gridData, !state.revealTarget);
@@ -942,7 +942,7 @@ function renderWordFind() {
         </div>
       </div>
       <footer class="footer">
-        <span>${cfg.wordFindSeconds ?? 15} seconds per word search</span>
+        <span>${cfg.wordFindSeconds ?? 20} seconds per word search</span>
         <span>Horizontal & vertical only · forwards or backwards</span>
       </footer>
       ${renderFeedback()}
