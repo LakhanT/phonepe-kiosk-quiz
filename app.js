@@ -117,6 +117,33 @@ function getQuizOptions(q) {
   return [a, b, c];
 }
 
+/** Shuffle A/B/C so the correct answer can appear in any position. */
+function buildShuffledQuizOptions(q, seed) {
+  const items = [
+    { text: q.options?.[0] ?? "", isCorrect: q.correctIndex === 0 },
+    { text: q.options?.[1] ?? "", isCorrect: q.correctIndex === 1 },
+    {
+      text: q.optionC ?? q.options?.[2] ?? "Proceed without checking the policy.",
+      isCorrect: false,
+    },
+  ];
+  shuffleInPlace(items, seededRandom(seed));
+  return {
+    options: items.map((x) => x.text),
+    correctIndex: items.findIndex((x) => x.isCorrect),
+  };
+}
+
+function ensureShuffledQuiz() {
+  const qIndex = state.questionIndex;
+  if (!state.shuffledQuiz || state.shuffledQuiz.forQuestion !== qIndex) {
+    const seed = state.puzzleVariant * 5003 + qIndex * 89 + 17;
+    const built = buildShuffledQuizOptions(activeQuestion(), seed);
+    state.shuffledQuiz = { forQuestion: qIndex, ...built };
+  }
+  return state.shuffledQuiz;
+}
+
 function shuffleInPlace(arr, rng) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
@@ -338,6 +365,7 @@ let state = {
   selEnd: null,
   locked: false,
   quizReveal: null,
+  shuffledQuiz: null,
   revealTarget: false,
 };
 
@@ -390,6 +418,7 @@ function startGame() {
   state.feedback = null;
   state.locked = false;
   state.quizReveal = null;
+  state.shuffledQuiz = null;
   state.revealTarget = false;
   state.screen = Screen.QUIZ;
   render();
@@ -445,13 +474,13 @@ async function answerQuiz(optionIndex) {
   if (state.locked || state.screen !== Screen.QUIZ) return;
   state.locked = true;
 
-  const q = activeQuestion();
-  const correct = optionIndex === q.correctIndex;
+  const shuffled = ensureShuffledQuiz();
+  const correct = optionIndex === shuffled.correctIndex;
   const quizPts = correct ? (cfg.quizPoints ?? 10) : 0;
-  const correctLabel = getAnswerLabel(q);
+  const correctLabel = shuffled.options[shuffled.correctIndex];
 
   state.currentRound = { quiz: quizPts, word: 0, quizCorrect: correct };
-  state.quizReveal = { picked: optionIndex, correct: q.correctIndex };
+  state.quizReveal = { picked: optionIndex, correct: shuffled.correctIndex };
 
   if (!correct) {
     beep("bad");
@@ -463,6 +492,7 @@ async function answerQuiz(optionIndex) {
     await delay(2600);
     state.feedback = null;
     state.quizReveal = null;
+    state.shuffledQuiz = null;
     finishRound();
     return;
   }
@@ -583,6 +613,7 @@ function finishRound() {
   state.selStart = null;
   state.selEnd = null;
   state.quizReveal = null;
+  state.shuffledQuiz = null;
   state.revealTarget = false;
   clearGridHandlers();
   state.questionIndex++;
@@ -615,6 +646,7 @@ function goStart() {
   state.feedback = null;
   state.locked = false;
   state.quizReveal = null;
+  state.shuffledQuiz = null;
   state.revealTarget = false;
   render();
 }
@@ -766,7 +798,7 @@ function renderStart() {
         <h1>Integrity <span>Challenge</span></h1>
         <p class="lead">
           Answer <strong>${roundCount} questions</strong> from the Ethics bank (${bankSize} total).
-          Each quiz shows <strong>3 options</strong> (A, B, and a related third choice).
+          Each quiz shows <strong>3 jumbled options</strong> — the correct answer can be A, B, or C.
           If correct, find that question’s <strong>keyword</strong> in a crossword that hides
           <strong>all ${roundCount} keywords</strong> (layout jumbled per player).
         </p>
@@ -807,7 +839,8 @@ function renderQuiz() {
   const q = activeQuestion();
   const total = state.roundQuestions.length;
   const reveal = state.quizReveal;
-  const opts = getQuizOptions(q)
+  const shuffled = ensureShuffledQuiz();
+  const opts = shuffled.options
     .map((opt, i) => {
       let extra = "";
       if (reveal) {
@@ -839,7 +872,7 @@ function renderQuiz() {
               ? reveal.picked === reveal.correct
                 ? "Correct!"
                 : "Incorrect — green option is the correct answer"
-              : "Tap the correct answer (A, B, or C)"
+              : "Options are jumbled — tap the correct answer (A, B, or C)"
           }</p>
           <div class="quiz-options">${opts}</div>
         </div>
